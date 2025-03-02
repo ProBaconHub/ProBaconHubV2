@@ -21,3 +21,4 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconH
 - TLOTBS RPG
 - Wordle
 - Zombie Attack (Beta)
+> **_NOTE:_**  More information on GitBook: [ProBaconHub](https://probacon-hub.gitbook.io/probaconhub)
