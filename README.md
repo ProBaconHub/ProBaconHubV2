@@ -22,5 +22,5 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconH
 - Wordle
 - Zombie Attack (Beta)
 
-> **_NOTE:_**  Prior releases of ProBaconHub will receive no further updates unless critical.
+> **_NOTE:_**  Prior releases of ProBaconHub will receive no further updates unless critical.  
 > **_NOTE:_**  More information on GitBook: [ProBaconHub](https://probacon-hub.gitbook.io/probaconhub)
