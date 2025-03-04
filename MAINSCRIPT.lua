@@ -46,8 +46,9 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.0"
-local PBH_LASTUPDATE = "1/3/2025"
+local PBH_VERSION = "REWRITE: 2.0.1"
+local PBH_LASTUPDATE = "4/3/2025"
+local UPDATELOG = "[REWRITE: 2.0.1]:\nAdded vehicle fly\nAdded update log\nAdded get loaderscript\n\n[REWRITE: 2.0.0]:\nNew release of the rewritten ProBaconHub."
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()
 local Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
 
@@ -344,7 +345,71 @@ playerflight_Sec:NewToggle("Fly [Bypass | Glitchy]", "Neglect gravity.", functio
         end
     end
 end, {getgenv().CONNECTFOLDER.BYPASSEDFLIGHT ~= nil, false})
-
+playerflight_Sec:NewToggle("Vehicle Fly", "Neglect gravity.", function(state)
+    if state and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            getgenv().VARIABLEFOLDER.BODYGYRO = Instance.new("BodyGyro", PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart)
+            getgenv().VARIABLEFOLDER.BODYGYRO.P = 9e4
+            getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY = Instance.new("BodyVelocity", PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart)
+            getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY.Velocity = Vector3.new(0, 0, 0)
+	        getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+	        getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY.P = 10000
+            getgenv().CONNECTFOLDER.VEHICLEFLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                getgenv().VARIABLEFOLDER.BODYGYRO.CFrame = PROTECTED_WORKSPACE.CurrentCamera.CoordinateFrame
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.lookAt(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position, PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position + PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector)
+                if PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Magnitude > 0.1 then
+                    getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY.Velocity = PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector) * getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED + PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector) * getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED
+                else
+                    getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY.Velocity = Vector3.new(0,0,0)
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+                end
+            end)
+            local FLIGHT_VELOCITY = getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY
+            getgenv().CONNECTFOLDER.CANCELFLIGHT = FLIGHT_VELOCITY.Changed:Connect(function(prop)
+                if prop == "Parent" then
+                    if getgenv().CONNECTFOLDER.VEHICLEFLIGHT then
+                        getgenv().CONNECTFOLDER.VEHICLEFLIGHT:Disconnect()
+                        getgenv().CONNECTFOLDER.VEHICLEFLIGHT = nil
+                    end
+                    if getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY then
+                        getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY:Destroy()
+                        getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY = nil
+                    end
+                    if getgenv().VARIABLEFOLDER.BODYGYRO then
+                        getgenv().VARIABLEFOLDER.BODYGYRO:Destroy()
+                        getgenv().VARIABLEFOLDER.BODYGYRO = nil
+                    end
+                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+                        end
+                    end
+                end
+            end)
+        end
+    else
+        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+            end
+        end
+        if getgenv().CONNECTFOLDER.VEHICLEFLIGHT then
+            getgenv().CONNECTFOLDER.VEHICLEFLIGHT:Disconnect()
+            getgenv().CONNECTFOLDER.VEHICLEFLIGHT = nil
+        end
+        if getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY then
+            getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY:Destroy()
+            getgenv().VARIABLEFOLDER.VEHICLEFLIGHTVELOCITY = nil
+        end
+        if getgenv().VARIABLEFOLDER.BODYGYRO then
+            getgenv().VARIABLEFOLDER.BODYGYRO:Destroy()
+            getgenv().VARIABLEFOLDER.BODYGYRO = nil
+        end
+        if getgenv().CONNECTFOLDER.CANCELFLIGHT then
+            getgenv().CONNECTFOLDER.CANCELFLIGHT:Disconnect()
+            getgenv().CONNECTFOLDER.CANCELFLIGHT = nil
+        end
+    end
+end, {getgenv().CONNECTFOLDER.VEHICLEFLIGHT ~= nil, false})
 
 playerlight_Sec:NewToggle("Full Bright", "Full bright enhance user's vision. Allowing player to see in the dark. \n(Client Side)", function(state)
     if state then
@@ -1356,6 +1421,12 @@ end)
 ui_Sec:NewSlider("Animation Speed (%)", "The higher the slower", 0, 200, function(value)
     Library:setanimationspeed(value/100)
 end, 100)
+ui_Sec:NewButton("Update Log", "This button allows user to view the update log", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog(UPDATELOG)
+end)
+ui_Sec:NewButton("Get loader script", "This button allows user to get the offical loader script for ProBaconHub V2.", function()
+    setclipboard("loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/LOADER.lua\"))()")
+end)
 
 extrascripts_Sec:NewButton("Console", "Load customed console.", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Pro-Bacon-Hub/refs/heads/main/Console"))()
@@ -1672,7 +1743,7 @@ elseif game.PlaceId == 3851622790 then --Break In Lobby
 elseif game.PlaceId == 4620170611 then -- Break In ingame
     local breakinstory_Tab = Window:NewTab("Break In (Story)")
     local breakinitem_Sec  = breakinstory_Tab:NewSection("Items")
-    local breakinunlock_Sec = breakinstory_Tab:NewSection("Cat")
+    local breakinunlock_Sec = breakinstory_Tab:NewSection("Unlock")
     local breakinauto_Sec = breakinstory_Tab:NewSection("Auto")
     local breakinending_Sec = breakinstory_Tab:NewSection("Endings (Shopping time)")
 
@@ -2645,7 +2716,7 @@ elseif game.PlaceId == 3214114884 then -- Flag Wars
                                     a.CanCollide = false
                                 end
                             end
-                            v.Character:FindFirstChild("HumanoidRootPart").CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0,0,-3.5)
+                            v.Character:FindFirstChild("HumanoidRootPart").CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(2,0,-7)
                         end
                     end
                 end
