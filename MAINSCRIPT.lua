@@ -46,9 +46,21 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.1"
-local PBH_LASTUPDATE = "4/3/2025"
-local UPDATELOG = "[REWRITE: 2.0.1]:\nAdded vehicle fly\nAdded update log\nAdded get loaderscript\n\n[REWRITE: 2.0.0]:\nNew release of the rewritten ProBaconHub."
+local PBH_VERSION = "REWRITE: 2.0.2"
+local PBH_LASTUPDATE = "5/3/2025"
+local UPDATELOG = [[
+[REWRITE: 2.0.2]:
+Fixed internet flooding when using "Mob Farm" and "Mob Farm V2" in The Legend Of The Bone Sword RPG.
+Added "Hide notification" option in The Legend Of The Bone Sword RPG.
+
+[REWRITE: 2.0.1]:
+Added vehicle fly.
+Added update log.
+Added get loaderscript.
+
+[REWRITE: 2.0.0]:
+New release of the rewritten ProBaconHub.
+]]
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()
 local Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
 
@@ -4529,18 +4541,21 @@ elseif game.PlaceId == 428375933 then -- The legend of the bone sword RPG
                         if v:FindFirstChild("HumanoidRootPart") and MOB_VALID_FOR_KILL(v) and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool") then
                             if getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGWEAPONTYPE == "Staff/Bow" then
                                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+                                PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(v.HumanoidRootPart.Position)
                             else
                                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = plrpos
                                 v.HumanoidRootPart.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool").Handle.CFrame
                             end
-                            PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(v.HumanoidRootPart.Position)
                         end
                     end
                 end
+                PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position)
             end)
-        elseif getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM ~= nil then
-            getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM:Disconnect()
-            getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM = nil
+        else
+            if getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM ~= nil then
+                getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM:Disconnect()
+                getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM = nil
+            end
         end
     end, {getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM ~= nil, false})
     thelegendoftheboneswordrpgmob_Sec:NewButton("Print all mob", "This allows user to see all mob's name.", function()
@@ -4566,25 +4581,31 @@ elseif game.PlaceId == 428375933 then -- The legend of the bone sword RPG
             end
             local plrpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
             getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
-                for i,v in pairs(PROTECTED_WORKSPACE.Enemies:GetChildren()) do
+                for _,v in pairs(PROTECTED_WORKSPACE.Enemies:GetChildren()) do
                     if table.find(getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2_FILTER, v.Name) and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
                         if v:FindFirstChild("HumanoidRootPart") and MOB_VALID_FOR_KILL(v) and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool") then
                             if getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGWEAPONTYPE == "Staff/Bow" then
                                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+                                PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(v.HumanoidRootPart.Position)
                             else
                                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = plrpos
                                 v.HumanoidRootPart.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool").Handle.CFrame
                             end
-                            PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(v.HumanoidRootPart.Position)
                         end
                     end
                 end
+                PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position)
             end)
-        elseif getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 ~= nil then
-            getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2:Disconnect()
-            getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 = nil
+        else
+            if getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 ~= nil then
+                getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2:Disconnect()
+                getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 = nil
+            end
         end
     end, {getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2 ~= nil, false})
+    thelegendoftheboneswordrpgmob2_Sec:NewToggle("Hide notifications", "This allows user to hide notifications.", function(state)
+        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.Notifications.Notifications.Visible = not state
+    end, {not PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.Notifications.Notifications.Visible, false})
 
     thelegnedoftheboneswordrpgweaponhitbox_Sec:NewToggle("Hit all mobs", "This allows user to hit all mobs on swing.", function(state)
         if state then
@@ -4878,10 +4899,14 @@ elseif game.PlaceId == 428375933 then -- The legend of the bone sword RPG
                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
                 for _,v in pairs(PROTECTED_WORKSPACE.Enemies:GetChildren()) do
                     if v.Name == "Mother of Chaos" then
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool") then
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("Tool") and MOB_VALID_FOR_KILL(v) then
                             PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v["Right Arm"].CFrame
                             PROTECTED_REPLICATEDSTORAGE.Remotes.UseItem:FireServer(v["Right Arm"].Position)
+                        elseif getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGMOTHEROFCHAOS_LASTPLRPOS ~= nil then
+                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGMOTHEROFCHAOS_LASTPLRPOS
+                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 5, 0)
                         end
+                        
                     end
                 end
             end)
