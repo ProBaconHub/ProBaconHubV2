@@ -49,11 +49,12 @@ local SUPPORTEDGAMES = {
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
 local PBH_VERSION = "REWRITE: 2.0.3"
-local PBH_LASTUPDATE = "5/3/2025"
+local PBH_LASTUPDATE = "7/3/2025"
 local UPDATELOG = [[
 [REWRITE: 2.0.3]:
 Fixed UI expandable clip issue.
 Fixed UI error on load.
+Fixed UI error when getting a service.
 New game support for Forsaken.
 Enhanced protection against detection.
 
@@ -108,6 +109,12 @@ if getgenv().VARIABLEFOLDER.PLAYERSTATUS == nil then
                 HIPHEIGHT = PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").HipHeight
             }
         end
+    else
+        getgenv().VARIABLEFOLDER.PLAYERSTATUS = {
+            WALKSPEED = 16,
+            JUMPPOWER = 50,
+            HIPHEIGHT = 2.2
+        }
     end
 else
     getgenv().VARIABLEFOLDER.PLAYERSTATUS = {
@@ -792,7 +799,7 @@ refreshesp_Sec:NewButton("Refresh ESP", "This button allows you to reload the ES
 local combat_Tab = Window:NewTab("Combat")
 local hitbox_Sec = combat_Tab:NewSection("Hitbox")
 local fling_Sec = combat_Tab:NewSection("Fling (Beta)")
-local DEFAULTPART = getgenv().VARIABLEFOLDER.DEFAULTPART or PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Name or "HumanoidRootPart"
+local DEFAULTPART = getgenv().VARIABLEFOLDER.DEFAULTPART or "HumanoidRootPart"
 local function HITBOXFILTERTABLEMANAGER()
     local HITBOXFILTERTABLE = {}
     for _,v in ipairs(PLAYERLIST) do
