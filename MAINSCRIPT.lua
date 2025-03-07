@@ -12,6 +12,7 @@ local PROTECTED_USERINPUTSERVICE = cloneref(game:GetService("UserInputService"))
 local PROTECTED_TWEENSERVICE = cloneref(game:GetService("TweenService"))
 local PROTECTED_TELEPORTSERVICE = cloneref(game:GetService("TeleportService"))
 local PROTECTED_VIRTUALINPUTMANAGER = cloneref(game:GetService("VirtualInputManager"))
+local PROTECTED_STARTERGUI = cloneref(game:GetService("StarterGui"))
 local setclipboard = setclipboard or print
 if getgenv().CONNECTFOLDER == nil then
     getgenv().CONNECTFOLDER = {}
@@ -37,18 +38,25 @@ local SUPPORTEDGAMES = {
     "City Life", -- 5802642341                      v
     "Destruction Simulator", -- 2248408710          v
     "Depthless RPG", -- 17488028902                 v
-    "Flag Wars", -- 3214114884                      v   DIRECTLY FROM OLD PBH
+    "Flag Wars", -- 3214114884                      v
     "Flee the Facility", -- 893973440               v   DIRECTLY FROM OLD PBH
+    "Forsaken", -- 18687417158
     "Mad City CH1", -- 91282350711571               v
     "Notoriety", -- 21532277 (Lobby)                v
     "Sonic Speed Sim", -- 9049840490                v
     "TLOTBS RPG", -- 428375933                      v
-    "Wordle", -- 17262338236
+    "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.2"
+local PBH_VERSION = "REWRITE: 2.0.3"
 local PBH_LASTUPDATE = "5/3/2025"
 local UPDATELOG = [[
+[REWRITE: 2.0.3]:
+Fixed UI expandable clip issue.
+Fixed UI error on load.
+New game support for Forsaken.
+Enhanced protection against detection.
+
 [REWRITE: 2.0.2]:
 Fixed internet flooding when using "Mob Farm" and "Mob Farm V2" in The Legend Of The Bone Sword RPG.
 Added "Hide notification" option in The Legend Of The Bone Sword RPG.
@@ -77,7 +85,7 @@ local unpack_functionpack = loadingSec:NewProgressBar("Unpack FunctionPack", "Un
 task.wait()
 local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
 load_RMD:AddProgress(1)
-local FUNCTIONPACK_UNPACKHASH = loadstring(game:HttpGet(getgenv().LINKTOUNPACKKEY))()
+local FUNCTIONPACK_UNPACKHASH = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/PHa1yNBRiI"))()
 getgenv().LINKTOUNPACKKEY = nil
 local ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
 unpack_functionpack:AddProgress(1)
@@ -437,10 +445,10 @@ playerlight_Sec:NewToggle("Full Bright", "Full bright enhance user's vision. All
         getgenv().CONNECTFOLDER.FULLBRIGHT = nil
     end
 end, {getgenv().CONNECTFOLDER.FULLBRIGHT ~= nil, false})
-playerlight_Sec:NewSlider("Light source brightness", "Change the brightness level of light source.", 0, 500, function(value)
+playerlight_Sec:NewSlider("Light brightness", "Change the brightness level of light source.", 0, 500, function(value)
     getgenv().VARIABLEFOLDER.LIGHTSOURCEBRIGHTNESS = value
 end, getgenv().VARIABLEFOLDER.LIGHTSOURCEBRIGHTNESS)
-playerlight_Sec:NewSlider("Light source range", "Change the range of light source.", 0, 100, function(value)
+playerlight_Sec:NewSlider("Light range", "Change the range of light source.", 0, 100, function(value)
     getgenv().VARIABLEFOLDER.LIGHTSOURCERANGE = value
 end, getgenv().VARIABLEFOLDER.LIGHTSOURCERANGE)
 playerlight_Sec:NewToggle("Enable Light Source", "Apply light source to character.", function(state)
@@ -2166,7 +2174,7 @@ elseif game.PlaceId == 4913581664 then -- Cart Ride Into Rdite
     end, {getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_CARTSTATE, false})
     cartcontrol_Sec:NewButton("Apply input to all carts", "This will push the inputs settings to all carts.", function()
         if not getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_SAFTYLOCK then
-            game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text='Starting'; Duration=5;})
+            PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text='Starting'; Duration=5;})
             getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_SAFTYLOCK = true
             for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
                 if v.Name == "On" and v:FindFirstChild("Click") then
@@ -2185,7 +2193,7 @@ elseif game.PlaceId == 4913581664 then -- Cart Ride Into Rdite
                 end
             end
             getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_SAFTYLOCK = false
-            game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text='Car speed set to: '..getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_CARTSPEED..'\n and state to: '..tostring(getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_CARTSTATE); Duration=5;})
+            PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text='Car speed set to: '..getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_CARTSPEED..'\n and state to: '..tostring(getgenv().VARIABLEFOLDER.CARTRIDEINTORDITE_CARTSTATE); Duration=5;})
         end
     end)
     cartcontrol_Sec:NewButton("Fix apply", "Use this button when apply input doesn't work anymore.", function()
@@ -3107,6 +3115,141 @@ elseif game.PlaceId == 893973440 then -- Flee the Facility
     fleethefacility_Sec:NewToggle("No PC error", "This allows user to avoid any error given by invalid calibration.", function(state)
         noPcError(state)
     end)
+elseif game.PlaceId == 18687417158 then -- Forsaken
+    local forsaken_Tab = Window:NewTab("Forsaken")
+    local forsakenfarm_Sec = forsaken_Tab:NewSection("Farm")
+    local forsakengenerator_Sec = forsaken_Tab:NewSection("Generator")
+    local forsakenmod_Sec = forsaken_Tab:NewSection("Mod")
+    getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN = getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN or 2.75
+    forsakenfarm_Sec:NewToggle("Basic Generator Farm", "This allows user to farm generators.", function(state)
+        getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM = state
+        if state then
+            coroutine.wrap(function()
+                repeat
+                    if workspace.Map:FindFirstChild("Ingame") then
+                        if workspace.Map.Ingame:FindFirstChild("Map") then
+                            for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+                                if v.Name == "Generator" and getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM then
+                                    if v.Progress.Value ~= 100 then
+                                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Positions.Center.CFrame
+                                        v.Main.Prompt.HoldDuration = 0
+                                        task.wait(.1)
+                                        PROTECTED_WORKSPACE.CurrentCamera.CFrame = CFrame.lookAt(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position+Vector3.new(0,15,15), v.Instances.Generator.Progress.Position)
+                                        task.wait(.1)
+                                        PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.F, false, game)
+                                        task.wait(.1)
+                                        PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+                                        repeat
+                                            v.Remotes.RE:FireServer()
+                                            local starttime = os.clock()
+                                            local cd = math.random(15, 20)/10
+                                            repeat
+                                                PROTECTED_RUNSERVICE.Heartbeat:Wait()
+                                            until os.clock()-starttime >= cd or v.Progress.Value == 100 or not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM
+                                            task.wait(0.001)
+                                        until v.Progress.Value == 100 or not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM or (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude > 10
+                                    end
+                                end
+                            end
+                            task.wait(1)
+                        end
+                    end
+                    task.wait(0.001)
+                until not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM
+            end)()
+        end
+    end, {getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM, false})
+    forsakengenerator_Sec:NewSlider("Solve cooldown", "This allows user to set cooldown to avoid detection.", 0, 10, function(var)
+        getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN = var
+    end, getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN)
+    forsakengenerator_Sec:NewToggle("Random cooldown", "Between 3s to 5s.", function(state)
+        getgenv().VARIABLEFOLDER.FORSAKENRANDOM = state
+    end, {getgenv().VARIABLEFOLDER.FORSAKENRANDOM, false})
+    forsakengenerator_Sec:NewToggle("Auto solve puzzle", "This allows user to solve puzzle without solving.", function(state)
+        if state then
+            getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING = PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+                if child.Name == "PuzzleUI" then
+                    for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+                        if v.Name == "Generator" then
+                            if (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 10 then
+                                while v.Progress.Value ~= 100 and PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:FindFirstChild("PuzzleUI") and (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 10 do
+                                    v.Remotes.RE:FireServer()
+                                    local starttime = os.clock()
+                                    local cd = 2.75
+                                    if getgenv().VARIABLEFOLDER.FORSAKENRANDOM then
+                                        cd = math.random(15, 50)/10
+                                    else
+                                        cd = getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN
+                                    end
+                                    repeat
+                                        PROTECTED_RUNSERVICE.Heartbeat:Wait()
+                                    until os.clock()-starttime >= cd or v.Progress.Value == 100 or not PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:FindFirstChild("PuzzleUI") or (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude > 10
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        elseif getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING ~= nil then
+            getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING:Disconnect()
+            getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING = nil
+        end
+    end, {getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING ~= nil, false})
+    forsakengenerator_Sec:NewButton("Highlight Generators", "This allows user to see the location of generators.", function()
+        for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+            if v.Name == "Generator" and not v:FindFirstChild("GeneratorHighlight") then
+                local generatorshighlight = Instance.new("Highlight", v)
+                generatorshighlight.Name = "GeneratorHighlight"
+                coroutine.wrap(function()
+                    while generatorshighlight and generatorshighlight.Parent and PROTECTED_RUNSERVICE.Heartbeat:Wait() do
+                        if v.Progress.Value ~= 100 then
+                            generatorshighlight.FillColor = Color3.new(1,0,0)
+                        else
+                            generatorshighlight.FillColor = Color3.new(1,1,0)
+                        end
+                    end
+                end)()
+            end
+        end
+    end)
+    forsakenmod_Sec:NewButton("Mod game", "This allows suer to mod their game. Such have infinite stamina and instant use item.", function()
+        for _,v in getgc(true) do
+            if type(v) == "table" and rawget(v, "ReloadTime") then
+                rawset(v, "ReloadTime", 0.01)
+                rawset(v, "ReservedAmmo", 9999)
+                rawset(v, "MagSize", 999)
+            end
+            if type(v) == "table" and rawget(v, "DrinkTime") then
+                rawset(v, "DrinkTime", 0.01)
+                rawset(v, "DrinkSpeedMultiplier", 5)
+                rawset(v, "SpeedLevel", 5)
+                rawset(v, "SpeedDuration", 100)
+            end
+            if type(v) == "table" and rawget(v, "SlashCooldown") then
+                rawset(v, "SlashCooldown", 0.01)
+                rawset(v, "ThirdSlashCooldown", 0.01)
+            end
+            if type(v) == "table" and rawget(v, "HealTime") then
+                rawset(v, "HealTime", 0.01)
+                rawset(v, "HealAmount", 100)
+                rawset(v, "HealSpeedMultiplier", 1)
+            end
+            if type(v) == "table" and rawget(v, "MaxStamina") then
+                rawset(v, "MaxStamina", 999999)
+                rawset(v, "StaminaLoss", 0)
+                rawset(v, "StaminaGain", math.huge)
+            end
+            if type(v) == "table" and rawget(v, "CloneAmount") then
+                rawset(v, "CloneAmount", 10)
+                rawset(v, "InvisibilityTime", 20)
+            end
+            if type(v) == "table" and rawget(v, "ShootHitboxSize") then
+                rawset(v, "ShootHitboxSize", 10)
+                rawset(v, "ShootHitboxRange", 900)
+            end
+        end
+    end)
+    forsakenmod_Sec:NewWarnLabel("You could also use bypass speed boost in Local Player tab.")
 elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
     local function isincrimbase(playername)
         local player = PROTECTED_PLAYERSERVICE[playername]
@@ -3233,7 +3376,7 @@ elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
     if (PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1048, 18, -492)).Magnitude > 5 then
         PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
         getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Instant"
-        game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text="Teleportation bypass available!"; Duration=5;})
+        PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Teleportation bypass available!"; Duration=5;})
     else
         PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
         BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Tween")
@@ -3800,11 +3943,11 @@ elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
                 end
             end
         else
-            game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text="Vehicle not found. Please wait until it respawns. We will notify you when it does"; Duration=5;})
+            Window:NotificationBar("Pro Bacon", "Vehicle not found. Please wait until it respawns. We will notify you when it does.", 5)
             repeat
                 task.wait(0.01)
-            until game.ObjectSelection:FindFirstChild("Buzzard")
-            game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text='Vehicle respawned. You can now use "Kill All Enemy".'; Duration=5;})
+            until PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard")
+            Window:NotificationBar("Pro Bacon", 'Vehicle respawned. You can now use "Kill All Enemy".', 2)
         end
     end)
     madcitych1combat_Sec:NewButton("No Camera Shake", "No shaking by explosives", function()
@@ -4137,7 +4280,7 @@ elseif NOTORIETYHEIST_PLACEID() ~= nil then -- Notoriety Heist
                 outline.FillColor = color
             end
         end)
-        game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text="Not all objects will be highlighted due to the limit of numbers of highlight."; Duration=5;})
+        PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Not all objects will be highlighted due to the limit of numbers of highlight."; Duration=5;})
         return fromadd
     end
     notorietyheistesp_Sec:NewToggle("Key ESP", "", function(state)
@@ -4233,7 +4376,7 @@ elseif NOTORIETYHEIST_PLACEID() ~= nil then -- Notoriety Heist
             outline.OutlineTransparency = 0
             outline.FillTransparency = 0.9
             outline.FillColor = Color3.new(0,1,1)
-            game.StarterGui:SetCore("SendNotification", {Title="Pro Bacon"; Text="Not all objects will be highlighted due to the limit of numbers of highlight."; Duration=5;})
+            PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Not all objects will be highlighted due to the limit of numbers of highlight."; Duration=5;})
         end
     end)
     notorietyheistother_Sec:NewButton("Quick ready", "", function()
@@ -4367,12 +4510,12 @@ elseif game.PlaceId == 9049840490 then -- Sonic Speed Simulator
             PROTECTED_REPLICATEDSTORAGE.Knit.Services.BossBattleService.RF.LeaveQueue:InvokeServer(PROTECTED_PLAYERSERVICE.LocalPlayer:GetAttribute("ZoneName"))
         end
     end)
-    sonicspeedsimulatorboss_Sec:NewButton("Damage Generator", "Instanse damage all genarator \nMotified from old ProBaconHub", function()
+    sonicspeedsimulatorboss_Sec:NewButton("Damage Generator", "Instanse damage all generators \nMotified from old ProBaconHub", function()
         for i = 1,12 do
             PROTECTED_REPLICATEDSTORAGE.Knit.Services.BossBattleService.RE.UpdateBattleState:FireServer("GeneratorDamaged",{["Generator"]=i})
         end
     end)
-    sonicspeedsimulatorboss_Sec:NewButton("Damage Boss", "Must damage all genarator first \nMotified from old ProBaconHub", function()
+    sonicspeedsimulatorboss_Sec:NewButton("Damage Boss", "Must damage all generators first \nMotified from old ProBaconHub", function()
         for i = 1,3 do
             PROTECTED_REPLICATEDSTORAGE.Knit.Services.BossBattleService.RE.UpdateBattleState:FireServer("Damage",{})
             task.wait(0.01)
