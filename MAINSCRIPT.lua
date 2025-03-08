@@ -49,7 +49,7 @@ local SUPPORTEDGAMES = {
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
 local PBH_VERSION = "REWRITE: 2.0.3"
-local PBH_LASTUPDATE = "7/3/2025"
+local PBH_LASTUPDATE = "8/3/2025"
 local UPDATELOG = [[
 [REWRITE: 2.0.3]:
 Fixed UI expandable clip issue.
@@ -3175,7 +3175,7 @@ elseif game.PlaceId == 18687417158 then -- Forsaken
     forsakengenerator_Sec:NewToggle("Auto solve puzzle", "This allows user to solve puzzle without solving.", function(state)
         if state then
             getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING = PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
-                if child.Name == "PuzzleUI" then
+                if child.Name == "PuzzleUI" and not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM then
                     for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
                         if v.Name == "Generator" then
                             if (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 10 then
@@ -4713,12 +4713,19 @@ elseif game.PlaceId == 428375933 then -- The legend of the bone sword RPG
             print(v)
         end
     end)
-    thelegendoftheboneswordrpgmob2_Sec:NewCheckbox("Mob", "This allows user to input the name of the mob.", getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGCHECKBOX, function(result)
+    local mobfarmv2checkbox = thelegendoftheboneswordrpgmob2_Sec:NewCheckbox("Mob", "This allows user to input the name of the mob.", getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGCHECKBOX, function(result)
         getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2_FILTER = {}
         for _,v in pairs(result) do
             if v[2] then
                 table.insert(getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGMOBFARM_V2_FILTER, v[1])
             end
+        end
+    end)
+    PROTECTED_WORKSPACE.Enemies.ChildAdded:Connect(function(child)
+        if not table.find(MOBLIST, child.Name) then
+            table.insert(MOBLIST, child.Name)
+            table.insert(getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGCHECKBOX, {child.Name, false})
+            mobfarmv2checkbox:Update(nil, nil, getgenv().VARIABLEFOLDER.THELEGENDOFTHEBONESWORDRPGCHECKBOX)
         end
     end)
     thelegendoftheboneswordrpgmob2_Sec:NewToggle("Mob farm V2", "This allows user to grind from a mob.", function(state)
@@ -4827,8 +4834,12 @@ elseif game.PlaceId == 428375933 then -- The legend of the bone sword RPG
     thelegendoftheboneswordrpgsnowflakekatana_candycane_Sec:NewToggle("Notify when Candy Cane spawns", "This allows user to get notified if a new candy cane has spawned.", function(state)
         if state then
             getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGSNOWFLAKEKATANA_NOTIFYCANDYCANE = PROTECTED_WORKSPACE.Parts.Decoration.ChosenToUse.Model.ChildAdded:Connect(function(child)
+                task.wait(1)
                 if child:IsA("MeshPart") and child:FindFirstChildWhichIsA("ProximityPrompt") then
-                    Window:NotificationBar("Pro Bacon", "A new candy cane spawned!")
+                    for _ = 1, 10 do
+                        Window:NotificationBar("Pro Bacon", "A new candy cane spawned!")
+                        task.wait(0.5)
+                    end
                 end
             end)
         elseif getgenv().CONNECTFOLDER.THELEGENDOFTHEBONESWORDRPGSNOWFLAKEKATANA_NOTIFYCANDYCANE ~= nil then
