@@ -48,9 +48,13 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.3"
+local PBH_VERSION = "REWRITE: 2.0.4"
 local PBH_LASTUPDATE = "8/3/2025"
 local UPDATELOG = [[
+[REWRITE: 2.0.4]:
+Updated to latest UI loader.
+Updated to latest UI Library version.
+
 [REWRITE: 2.0.3]:
 Fixed UI expandable clip issue.
 Fixed UI error on load.
@@ -70,7 +74,7 @@ Added get loaderscript.
 [REWRITE: 2.0.0]:
 New release of the rewritten ProBaconHub.
 ]]
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()("nyoe1V40yD")
 local Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
 
 Library:toggle_ui(true)
@@ -1390,6 +1394,7 @@ local extra_Tab = Window:NewTab("Extra")
 local client_Sec = extra_Tab:NewSection("Client")
 local player_Sec = extra_Tab:NewSection("Player")
 local ui_Sec = extra_Tab:NewSection("UI")
+local uilib_Sec = extra_Tab:NewSection("Library")
 local extrascripts_Sec = extra_Tab:NewSection("Scripts")
 
 client_Sec:NewToggle("Anti Idle/AFK", "Enabling this allows user to be idle/away from keyboard(AFK) for more than 20 minutes.", function(state)
@@ -1453,6 +1458,10 @@ ui_Sec:NewButton("Update Log", "This button allows user to view the update log",
 end)
 ui_Sec:NewButton("Get loader script", "This button allows user to get the offical loader script for ProBaconHub V2.", function()
     setclipboard("loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/LOADER.lua\"))()")
+end)
+uilib_Sec:NewLabel("Version: "..Window:GetVersion())
+uilib_Sec:NewButton("UI Change Log", "This allows user to view the change log of the UI library.", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog(Window:GetUpdateLog())
 end)
 
 extrascripts_Sec:NewButton("Console", "Load customed console.", function()
@@ -3133,6 +3142,8 @@ elseif game.PlaceId == 18687417158 then -- Forsaken
         if state then
             coroutine.wrap(function()
                 repeat
+                    local start = os.clock()
+                    local used = 0
                     if workspace.Map:FindFirstChild("Ingame") then
                         if workspace.Map.Ingame:FindFirstChild("Map") then
                             for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
@@ -3146,19 +3157,15 @@ elseif game.PlaceId == 18687417158 then -- Forsaken
                                         PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.F, false, game)
                                         task.wait(.1)
                                         PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.F, false, game)
-                                        repeat
-                                            v.Remotes.RE:FireServer()
-                                            local starttime = os.clock()
-                                            local cd = math.random(15, 20)/10
-                                            repeat
-                                                PROTECTED_RUNSERVICE.Heartbeat:Wait()
-                                            until os.clock()-starttime >= cd or v.Progress.Value == 100 or not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM
-                                            task.wait(0.001)
-                                        until v.Progress.Value == 100 or not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM or (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude > 10
+                                        v.Remotes.RE:FireServer()
+                                        task.wait(.001)
+                                        PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.W, false, game)
+                                        task.wait(.001)
+                                        PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.W, false, game)
                                     end
                                 end
                             end
-                            task.wait(1)
+                            task.wait(1.1-(os.clock()-start))
                         end
                     end
                     task.wait(0.001)
@@ -3242,8 +3249,7 @@ elseif game.PlaceId == 18687417158 then -- Forsaken
                 rawset(v, "HealSpeedMultiplier", 1)
             end
             if type(v) == "table" and rawget(v, "MaxStamina") then
-                rawset(v, "MaxStamina", 999999)
-                rawset(v, "StaminaLoss", 0)
+                rawset(v, "MaxStamina", math.huge)
                 rawset(v, "StaminaGain", math.huge)
             end
             if type(v) == "table" and rawget(v, "CloneAmount") then
