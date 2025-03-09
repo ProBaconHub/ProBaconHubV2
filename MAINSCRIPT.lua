@@ -48,9 +48,12 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.6"
+local PBH_VERSION = "REWRITE: 2.0.7"
 local PBH_LASTUPDATE = "9/3/2025 (UTC)"
 local UPDATELOG = [[
+[REWRITE: 2.0.7]:
+Added "Dig aura" in Flag Wars.
+
 [REWRITE: 2.0.6]:
 Fixed Mad City "Kill All Enemy"
 Fixed Mad City "Spawn Vehicle"
@@ -69,6 +72,7 @@ Fixed UI error on load.
 Fixed UI error when getting a service.
 New game support for Forsaken.
 Enhanced protection against detection.
+Enhanced genrator farm speed in Forsaken.
 
 [REWRITE: 2.0.2]:
 Fixed internet flooding when using "Mob Farm" and "Mob Farm V2" in The Legend Of The Bone Sword RPG.
@@ -2801,6 +2805,28 @@ if success then
         flagwar_Sec:NewButton("Grab flag", "", function()
             flagwarcheat.GRABFLAG(ProBaconFunction)
         end)
+        flagwar_Sec:NewButton("Dig aura", "This allows user to dig dirts within 20 studs.", function()
+            for _,chunk in pairs(workspace.Core.CurrentDirt:GetChildren()) do
+                for _,v in pairs(chunk:GetChildren()) do
+                    coroutine.wrap(function()
+                        while true do
+                            if v and game.Players.LocalPlayer.Character then
+                                if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                    if (v.Position-game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).magnitude <= 20 then
+                                        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Dig"):FireServer("Shovel",v)
+                                    end
+                                    task.wait(0.1)
+                                else
+                                    break
+                                end
+                            else
+                                break
+                            end
+                        end
+                    end)()
+                end
+            end
+        end)
     
         local theMeleeId = nil
         local remotehook = nil
@@ -3615,6 +3641,12 @@ if success then
                         if v.Team.Name == "Prisoners" then
                             break
                         end
+                        local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
+                        tpbypass.Transparency, tpbypass.CanCollide = 1, false
+                        tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                        task.wait()
+                        PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
+                        tpbypass.Transparency, tpbypass.CanCollide = 0, true
                         PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
                         PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", v)
                         PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Arrest", v)
