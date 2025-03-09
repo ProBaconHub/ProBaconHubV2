@@ -48,9 +48,13 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.5"
-local PBH_LASTUPDATE = "8/3/2025"
+local PBH_VERSION = "REWRITE: 2.0.6"
+local PBH_LASTUPDATE = "9/3/2025 (UTC)"
 local UPDATELOG = [[
+[REWRITE: 2.0.6]:
+Fixed Mad City "Kill All Enemy"
+Fixed Mad City "Spawn Vehicle"
+
 [REWRITE: 2.0.5]:
 Updated to latest UI loader.
 
@@ -3152,7 +3156,6 @@ if success then
                 coroutine.wrap(function()
                     repeat
                         local start = os.clock()
-                        local used = 0
                         if workspace.Map:FindFirstChild("Ingame") then
                             if workspace.Map.Ingame:FindFirstChild("Map") then
                                 for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
@@ -3164,8 +3167,9 @@ if success then
                                             PROTECTED_WORKSPACE.CurrentCamera.CFrame = CFrame.lookAt(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position+Vector3.new(0,15,15), v.Instances.Generator.Progress.Position)
                                             task.wait(.1)
                                             PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                                            task.wait(.1)
+                                            task.wait(.001)
                                             PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+                                            task.wait(.1)
                                             v.Remotes.RE:FireServer()
                                             task.wait(.001)
                                             PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.W, false, game)
@@ -3200,7 +3204,7 @@ if success then
                                         local starttime = os.clock()
                                         local cd = 2.75
                                         if getgenv().VARIABLEFOLDER.FORSAKENRANDOM then
-                                            cd = math.random(15, 50)/10
+                                            cd = math.random(12, 50)/10
                                         else
                                             cd = getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN
                                         end
@@ -3354,13 +3358,13 @@ if success then
         local function SpawnVehicle(name)
             local vehicletoget = PROTECTED_WORKSPACE.ObjectSelection[name]
             local _, boudingvector3 = vehicletoget:GetBoundingBox()
-            vehicletoget:SetHumanoidRootPartCFrame(CFrame.new(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.x, PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.y+(boudingvector3.y/2), PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.z))
-            vehicletoget.HumanoidRootPart.Anchored = true
+            vehicletoget:SetPrimaryPartCFrame(CFrame.new(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.x, PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.y+(boudingvector3.y/2), PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.z))
+            vehicletoget.PrimaryPart.Anchored = true
             task.wait(.05)
             PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = vehicletoget.DriveSeat.CFrame*CFrame.new(0,2,0)
             task.wait(.25)
             vehicletoget.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
-            vehicletoget.HumanoidRootPart.Anchored = false
+            vehicletoget.PrimaryPart.Anchored = false
         end
         local function isEnemyTeam(player)
             if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" and PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heroes" then
@@ -3602,7 +3606,7 @@ if success then
                     PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
                 end
                 if CheckArrestable(v) then
-                    for a = 1, 200 do
+                    for _ = 1, 200 do
                         if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
                             local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
                             Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
@@ -3611,12 +3615,6 @@ if success then
                         if v.Team.Name == "Prisoners" then
                             break
                         end
-                        local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
-                        tpbypass.Transparency, tpbypass.CanCollide = 1, false
-                        tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                        task.wait()
-                        PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
-                        tpbypass.Transparency, tpbypass.CanCollide = 0, true
                         PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
                         PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", v)
                         PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Arrest", v)
@@ -3911,8 +3909,8 @@ if success then
             if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard") then
                 local lastpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
                 local buzzardweusehere = PROTECTED_WORKSPACE.ObjectSelection.Buzzard
-                local returnplace = buzzardweusehere.HumanoidRootPart.CFrame*CFrame.new(0 , 5, 20)
-                buzzardweusehere:SetHumanoidRootPartCFrame(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 5, 5))
+                local returnplace = buzzardweusehere.PrimaryPart.CFrame*CFrame.new(0 , 5, 20)
+                buzzardweusehere:SetPrimaryPartCFrame(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 5, 5))
                 task.wait()
                 buzzardweusehere.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
                 task.wait()
@@ -3956,7 +3954,7 @@ if success then
                 until tasks == 0 or not PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart
                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Sit = false
                 task.wait(.05)
-                PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):SetHumanoidRootPartCFrame(returnplace)
+                PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):SetPrimaryPartCFrame(returnplace)
                 PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = lastpos
                 task.wait(5)
                 if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") then
