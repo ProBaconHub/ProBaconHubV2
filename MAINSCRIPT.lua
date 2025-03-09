@@ -106,7 +106,7 @@ local success, output = pcall(function()
     task.wait()
     local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
     load_RMD:AddProgress(1)
-    local FUNCTIONPACK_UNPACKHASH = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/PHa1yNBRiI"))()
+    local FUNCTIONPACK_UNPACKHASH = loadstring(game:HttpGet(getgenv().LINKTOUNPACKKEY))()
     getgenv().LINKTOUNPACKKEY = nil
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
