@@ -3278,10 +3278,6 @@ if success then
                     rawset(v, "SpeedLevel", 5)
                     rawset(v, "SpeedDuration", 100)
                 end
-                if type(v) == "table" and rawget(v, "SlashCooldown") then
-                    rawset(v, "SlashCooldown", 0.01)
-                    rawset(v, "ThirdSlashCooldown", 0.01)
-                end
                 if type(v) == "table" and rawget(v, "HealTime") then
                     rawset(v, "HealTime", 0.01)
                     rawset(v, "HealAmount", 100)
