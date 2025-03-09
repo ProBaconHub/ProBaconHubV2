@@ -3,18 +3,19 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/LOADER.lua"))()
 ```
 
-### Supported games [1/3/2025]
+### Supported games [9/3/2025]
 - Base Battles!
 - Blox Hunt
 - Break In (Story)
 - Build a Boat
 - Build and Survive! Classic
 - Cart Ride Into Rdite
-- City Life
+- City Life   
 - Destruction Simulator
-- Depthless RPG
-- Flag Wars
+- Depthless RPG 
+- Flag Wars    
 - Flee the Facility
+- Forsaken
 - Mad City CH1
 - Notoriety
 - Sonic Speed Sim
