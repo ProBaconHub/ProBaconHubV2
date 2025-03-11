@@ -48,9 +48,12 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.8"
+local PBH_VERSION = "REWRITE: 2.0.9"
 local PBH_LASTUPDATE = "11/3/2025 (UTC)"
 local UPDATELOG = [[
+[REWRITE: 2.0.9]:
+Fixed minor issues.
+
 [REWRITE: 2.0.8]:
 Updated to latest console script.
 Updated to latest function pack.
@@ -1486,7 +1489,7 @@ if success then
     end)
     uilib_Sec:NewLabel("Version: "..Window:GetVersion())
     uilib_Sec:NewButton("UI Change Log", "This allows user to view the change log of the UI library.", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog(Window:GetUpdateLog())
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog(Window:GetChangeLog())
     end)
     
     extrascripts_Sec:NewButton("Console", "Load customed console.", function()
