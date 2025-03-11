@@ -48,9 +48,16 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.7"
-local PBH_LASTUPDATE = "9/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.0.8"
+local PBH_LASTUPDATE = "11/3/2025 (UTC)"
 local UPDATELOG = [[
+[REWRITE: 2.0.8]:
+Updated to latest console script.
+Updated to latest function pack.
+Fixed "no clip" in certain games.
+Optimised some scripts.
+Removed extra stuff.
+
 [REWRITE: 2.0.7]:
 Added "Dig aura" in Flag Wars.
 
@@ -103,10 +110,11 @@ local success, output = pcall(function()
         Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 3)
     end)
     local unpack_functionpack = loadingSec:NewProgressBar("Unpack FunctionPack", "Unpacking ProBaconFunctionPack \nRequired.", 0, 1)
-    task.wait()
+    task.wait(0.1) --Prevent stack overflow
     local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
     load_RMD:AddProgress(1)
-    local FUNCTIONPACK_UNPACKHASH = loadstring(game:HttpGet(getgenv().LINKTOUNPACKKEY))()
+    task.wait(0.1) --Prevent stack overflow
+    local FUNCTIONPACK_UNPACKHASH = getgenv().LINKTOUNPACKKEY
     getgenv().LINKTOUNPACKKEY = nil
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
@@ -1482,7 +1490,7 @@ if success then
     end)
     
     extrascripts_Sec:NewButton("Console", "Load customed console.", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Pro-Bacon-Hub/refs/heads/main/Console"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/Console"))()
     end)
     extrascripts_Sec:NewButton("Infinite Yeild", "Load Infinitey Yield.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
@@ -2806,14 +2814,14 @@ if success then
             flagwarcheat.GRABFLAG(ProBaconFunction)
         end)
         flagwar_Sec:NewButton("Dig aura", "This allows user to dig dirts within 20 studs.", function()
-            for _,chunk in pairs(workspace.Core.CurrentDirt:GetChildren()) do
+            for _,chunk in pairs(PROTECTED_WORKSPACE.Core.CurrentDirt:GetChildren()) do
                 for _,v in pairs(chunk:GetChildren()) do
                     coroutine.wrap(function()
                         while true do
-                            if v and game.Players.LocalPlayer.Character then
-                                if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                                    if (v.Position-game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).magnitude <= 20 then
-                                        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Dig"):FireServer("Shovel",v)
+                            if v and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                                if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                    if (v.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).magnitude <= 20 then
+                                        PROTECTED_REPLICATEDSTORAGE:WaitForChild("Events"):WaitForChild("Dig"):FireServer("Shovel",v)
                                     end
                                     task.wait(0.1)
                                 else
@@ -3182,9 +3190,9 @@ if success then
                 coroutine.wrap(function()
                     repeat
                         local start = os.clock()
-                        if workspace.Map:FindFirstChild("Ingame") then
-                            if workspace.Map.Ingame:FindFirstChild("Map") then
-                                for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+                        if PROTECTED_WORKSPACE.Map:FindFirstChild("Ingame") then
+                            if PROTECTED_WORKSPACE.Map.Ingame:FindFirstChild("Map") then
+                                for _,v in pairs(PROTECTED_WORKSPACE.Map.Ingame.Map:GetChildren()) do
                                     if v.Name == "Generator" and getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM then
                                         if v.Progress.Value ~= 100 then
                                             PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Positions.Center.CFrame
@@ -3222,7 +3230,7 @@ if success then
             if state then
                 getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING = PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
                     if child.Name == "PuzzleUI" and not getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM then
-                        for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+                        for _,v in pairs(PROTECTED_WORKSPACE.Map.Ingame.Map:GetChildren()) do
                             if v.Name == "Generator" then
                                 if (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 10 then
                                     while v.Progress.Value ~= 100 and PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:FindFirstChild("PuzzleUI") and (v.Instances.Generator.Progress.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 10 do
@@ -3249,7 +3257,7 @@ if success then
             end
         end, {getgenv().CONNECTFOLDER.FORSAKENAUTOPUZZLESOLVING ~= nil, false})
         forsakengenerator_Sec:NewButton("Highlight Generators", "This allows user to see the location of generators.", function()
-            for _,v in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+            for _,v in pairs(PROTECTED_WORKSPACE.Map.Ingame.Map:GetChildren()) do
                 if v.Name == "Generator" and not v:FindFirstChild("GeneratorHighlight") then
                     local generatorshighlight = Instance.new("Highlight", v)
                     generatorshighlight.Name = "GeneratorHighlight"
