@@ -48,9 +48,16 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.9"
-local PBH_LASTUPDATE = "11/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.0.10"
+local PBH_LASTUPDATE = "15/3/2025 (UTC)"
 local UPDATELOG = [[
+[REWRITE: 2.0.10 (15/3/2025)]:
+Updated to be capatable with UI 1.5.1 version.
+Capatable with UI 1.5.2b.
+Ready for UI 1.6.0b.
+Added "Virtual Editor".
+Reduced fling force maxmium (100000 -> 10000).
+
 [REWRITE: 2.0.9]:
 Fixed minor issues.
 
@@ -100,7 +107,7 @@ New release of the rewritten ProBaconHub.
 local Library, Window, ProBaconFunction
 
 local success, output = pcall(function()
-    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.5.0")
+    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.5.1")
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
     Library:toggle_ui(true)
@@ -109,7 +116,6 @@ local success, output = pcall(function()
     local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 2, function()
         Window:NotificationBar("ProBaconHub", "Successfully loaded RMD", 1)
         task.wait(0.1)
-        Window:NotificationBar("ProBaconHub", "Thanks for using.", 2)
         Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 3)
     end)
     local unpack_functionpack = loadingSec:NewProgressBar("Unpack FunctionPack", "Unpacking ProBaconFunctionPack \nRequired.", 0, 1)
@@ -117,7 +123,7 @@ local success, output = pcall(function()
     local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
     load_RMD:AddProgress(1)
     task.wait(0.1) --Prevent stack overflow
-    local FUNCTIONPACK_UNPACKHASH = getgenv().LINKTOUNPACKKEY
+    local FUNCTIONPACK_UNPACKHASH = tostring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/0afIOgw33a"))
     getgenv().LINKTOUNPACKKEY = nil
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
@@ -1023,7 +1029,7 @@ if success then
             Window:NotificationBar("Pro Bacon", "Player not found.")
         end
     end)
-    fling_Sec:NewSlider("Fling Force", "The higher force, the further it goes", 0, 100000, function(var)
+    fling_Sec:NewSlider("Fling Force", "The higher force, the further it goes", 0, 10000, function(var)
         getgenv().VARIABLEFOLDER.FLINGFORCE = var
     end, getgenv().VARIABLEFOLDER.FLINGFORCE or 2000)
     local LASTCFRAMEBEFOREFLING
@@ -1494,6 +1500,9 @@ if success then
     
     extrascripts_Sec:NewButton("Console", "Load customed console.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/Console"))()
+    end)
+    extrascripts_Sec:NewButton("Virtual Editor", "Load virtual executor/editor (UNC level is based on your injected executor.", function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/VirtualExecutor"))()
     end)
     extrascripts_Sec:NewButton("Infinite Yeild", "Load Infinitey Yield.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
