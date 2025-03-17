@@ -48,42 +48,50 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.10"
-local PBH_LASTUPDATE = "15/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.0.11"
+local PBH_LASTUPDATE = "16/3/2025 (UTC)"
 local UPDATELOG = [[
-[REWRITE: 2.0.10 (15/3/2025)]:
+<b>[REWRITE: 2.0.11 (16/3/25)]:</b>
+<font color="rgb(0, 162, 255)">Fixed</font> "Virtual Executor" UI issue.
+Changed the UI path of "Virtual Executor" to CoreGui.
+<font color="rgb(0, 225, 0)">Added</font> highlighting in "Update Log".
+Seperated "Virtual Executor" and "Virtual Executor BETA".
+There will be <font color="rgb(215, 90, 74)">no</font> further updates any time soon.
+Script now comes with better error handeling. <font transparency="0.5">(Some times might break.)</font>
+
+<b>[REWRITE: 2.0.10 (15/3/25)]:</b>
 Updated to be capatable with UI 1.5.1 version.
 Capatable with UI 1.5.2b.
 Ready for UI 1.6.0b.
 Added "Virtual Editor".
 Reduced fling force maxmium (100000 -> 10000).
 
-[REWRITE: 2.0.9]:
+<b>[REWRITE: 2.0.9]:</b>
 Fixed minor issues.
 
-[REWRITE: 2.0.8]:
+<b>[REWRITE: 2.0.8]:</b>
 Updated to latest console script.
 Updated to latest function pack.
 Fixed "no clip" in certain games.
 Optimised some scripts.
 Removed extra stuff.
 
-[REWRITE: 2.0.7]:
+<b>[REWRITE: 2.0.7]:</b>
 Added "Dig aura" in Flag Wars.
 
-[REWRITE: 2.0.6]:
+<b>[REWRITE: 2.0.6]:</b>
 Fixed Mad City "Kill All Enemy"
 Fixed Mad City "Spawn Vehicle"
 
-[REWRITE: 2.0.5]:
+<b>[REWRITE: 2.0.5]:</b>
 Updated to latest UI loader.
 
-[REWRITE: 2.0.4]:
+<b>[REWRITE: 2.0.4]:</b>
 Updated to latest UI loader.
 Updated to latest UI Library version.
 Fixed offical verification issue.
 
-[REWRITE: 2.0.3]:
+<b>[REWRITE: 2.0.3]:</b>
 Fixed UI expandable clip issue.
 Fixed UI error on load.
 Fixed UI error when getting a service.
@@ -91,16 +99,16 @@ New game support for Forsaken.
 Enhanced protection against detection.
 Enhanced genrator farm speed in Forsaken.
 
-[REWRITE: 2.0.2]:
+<b>[REWRITE: 2.0.2]:</b>
 Fixed internet flooding when using "Mob Farm" and "Mob Farm V2" in The Legend Of The Bone Sword RPG.
 Added "Hide notification" option in The Legend Of The Bone Sword RPG.
 
-[REWRITE: 2.0.1]:
+<b>[REWRITE: 2.0.1]:</b>
 Added vehicle fly.
 Added update log.
 Added get loaderscript.
 
-[REWRITE: 2.0.0]:
+<b>[REWRITE: 2.0.0]:</b>
 New release of the rewritten ProBaconHub.
 ]]
 
@@ -870,7 +878,7 @@ if success then
     local HITBOXEXPAND_SIZE_Z = hitbox_Sec:NewSlider("Size Z", "Size Z of the player should be the deapth of the hitbox.", 2, 100, function(var)
         getgenv().VARIABLEFOLDER.HITBOXEXPANDZ = var
     end, getgenv().VARIABLEFOLDER.HITBOXEXPANDZ)
-    local HITBOXEXPAND_SIZE_MIXED = hitbox_Sec:NewSlider("Size Mixed", "This slider will change X, Y and Z at the same time.", 2, 100, function(var)
+    local HITBOXEXPAND_SIZE_MIXED = hitbox_Sec:NewSlider("Size Mixed", "This slider will change X, Y and Z at the same time soon..", 2, 100, function(var)
         getgenv().VARIABLEFOLDER.HITBOXEXPANDMIXED = var
     end, getgenv().VARIABLEFOLDER.HITBOXEXPANDMIXED)
     hitbox_Sec:NewTextBox("Size", "This is an input box. User can input a 3 dimantional value \nExample: 5,5,5 or 5, 5, 5", function(var)
@@ -1488,7 +1496,7 @@ if success then
         Library:setanimationspeed(value/100)
     end, 100)
     ui_Sec:NewButton("Update Log", "This button allows user to view the update log", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog(UPDATELOG)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog("<font color =\"rgb(255, 218, 68)\">Please note that last update date does not mean realease date.</font>\n\n"..UPDATELOG)
     end)
     ui_Sec:NewButton("Get loader script", "This button allows user to get the offical loader script for ProBaconHub V2.", function()
         setclipboard("loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/LOADER.lua\"))()")
@@ -1501,8 +1509,11 @@ if success then
     extrascripts_Sec:NewButton("Console", "Load customed console.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/Console"))()
     end)
-    extrascripts_Sec:NewButton("Virtual Editor", "Load virtual executor/editor (UNC level is based on your injected executor.", function()
+    extrascripts_Sec:NewButton("Virtual Editor", "Load virtual executor/editor (UNC level is based on your injected executor).", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/VirtualExecutor"))()
+    end)
+    extrascripts_Sec:NewButton("Virtual Editor [BETA]", "Load the beta version of virtual executor/editor (UNC level is based on your injected executor).\nPlease keep in mind that beta version works the same. Only the syntax highlighting method has been changed.", function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/VirtualExecutorBeta"))()
     end)
     extrascripts_Sec:NewButton("Infinite Yeild", "Load Infinitey Yield.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
@@ -1818,7 +1829,7 @@ if success then
         local breakinitem_Sec  = breakinstory_Tab:NewSection("Items")
         local breakinunlock_Sec = breakinstory_Tab:NewSection("Unlock")
         local breakinauto_Sec = breakinstory_Tab:NewSection("Auto")
-        local breakinending_Sec = breakinstory_Tab:NewSection("Endings (Shopping time)")
+        local breakinending_Sec = breakinstory_Tab:NewSection("Endings (Shopping time soon.)")
     
         breakinitem_Sec:NewDropdown("Give item", "This dropdown allows user to get any items they want, in the list.", {"Apple", "Bat", "BloxyCola", "Cookie", "Cure", "Chips", "ExpiredBloxyCola", "MedKit", "Pizza", "TeddyBloxpin"},function(opt)
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteEvents"):WaitForChild("GiveTool"):FireServer(opt)
@@ -2308,7 +2319,7 @@ if success then
                 end
             end)()
         end)
-        citylifegeneral_Sec:NewButton("Get [Public Menace] Badage", "This button allows the user to get the [Public Menace] badge. This may take some time.", function()
+        citylifegeneral_Sec:NewButton("Get [Public Menace] Badage", "This button allows the user to get the [Public Menace] badge. This may take some time soon..", function()
             for i = 1, 100 do
                 PROTECTED_REPLICATEDSTORAGE.remoteInterface.vehicles.objectsHitByCarCount:FireServer()
             end
@@ -2728,7 +2739,7 @@ if success then
             getgenv().CONNECTFOLDER.DEPTHLESSRPGAUTOKILL = state
             deapthlesscheat.AUTOKILL(state)
         end, {getgenv().CONNECTFOLDER.DEPTHLESSRPGAUTOKILL, false})
-        depthlessrpg_Sec:NewButton("Mod weapon", "This allows user to mod their weapon such as setting cooldown time to 0.", function()
+        depthlessrpg_Sec:NewButton("Mod weapon", "This allows user to mod their weapon such as setting cooldown time soon. to 0.", function()
             deapthlesscheat.MODWEAPON()
         end)
         depthlessrpg_Sec:NewToggle("God Mode", "This allows user to gain health. Making user semi-god mode.", function(state)
@@ -4130,7 +4141,7 @@ if success then
         end
         notorietylobby_Sec:NewDropdown("Join Heist", "This allows user to join any heist map.", NOTORIETY_HEIST, function(opt)
             Window:NotificationBar("Pro Bacon", "Teleporting to heist: "..tostring(opt))
-            Window:NotificationBar("Pro Bacon", "May take some time to load heist after join.")
+            Window:NotificationBar("Pro Bacon", "May take some time soon. to load heist after join.")
             PROTECTED_TELEPORTSERVICE:Teleport(NOTORIETY_HEIST_TABLE[tostring(opt)]["PlaceID"])
         end)
     elseif NOTORIETYHEIST_PLACEID() ~= nil then -- Notoriety Heist
@@ -4527,10 +4538,10 @@ if success then
                 task.wait(1)
             end
         end)
-        sonicspeedsimulatorquest_Sec:NewButton("Speed boost quest", "This button allows user to gain boost time to complete boost quest.", function()
+        sonicspeedsimulatorquest_Sec:NewButton("Speed boost quest", "This button allows user to gain boost time soon. to complete boost quest.", function()
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("BoostTime", 10)
         end)
-        sonicspeedsimulatorquest_Sec:NewButton("Hover board boost quest", "This button allows user to gain hover board boost time to complete hover board boost time quest.", function()
+        sonicspeedsimulatorquest_Sec:NewButton("Hover board boost quest", "This button allows user to gain hover board boost time soon. to complete hover board boost time soon. quest.", function()
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("HoverboardBoostAmount", 1, {["ZoneName"] = PROTECTED_PLAYERSERVICE.LocalPlayer:GetAttribute("ZoneName")})
         end)
         sonicspeedsimulatorquest_Sec:NewButton("Complete RailGrindPoints quest", "This button allows user to gain rail-graind points to complete railgrindpoints quest.", function()
@@ -5277,7 +5288,7 @@ if success then
                 getgenv().CONNECTFOLDER.ZOMBIEATTACKAUTOKILL = nil
             end
         end, {getgenv().CONNECTFOLDER.ZOMBIEATTACKAUTOKILL ~= nil, false})
-        zombieattackfarmv2_Sec:NewSlider("CD per shot (ms)", "This allows user to set the cooldown time for auto kill v2", 1, 1000, function(var)
+        zombieattackfarmv2_Sec:NewSlider("CD per shot (ms)", "This allows user to set the cooldown time soon. for auto kill v2", 1, 1000, function(var)
             getgenv().VARIABLEFOLDER.ZOMBIEATTACKAUTOKILLV2_COOLDOWN = var/1000
         end, 100)
         zombieattackfarmv2_Sec:NewToggle("Auto Kill V2", "This allows user to kill enemy mobs.", function(state)
@@ -5399,5 +5410,17 @@ if success then
         Window:NotificationBar("Pro Bacon", "Supported game detected", 2)
     end
 elseif string.find(tostring(output), "stack overflow") ~= nil then
-    Window:NotificationBar("ERROR", "Stack overflow. Please close this window and execute again.")
+    if Window then
+        Window:NotificationBar("ERROR", "Stack overflow. Please close this window and execute again.")
+    else
+        PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="ERROR"; Text="Stack overflow. Please close this window and execute again."; Duration=5;})
+    end
+elseif string.find(tostring(output), "error in error handling") ~= nil then
+    if Window then
+        Window:NotificationBar("ERROR", "Load error. Please rejoin the game and execute again.")
+    else
+        PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="ERROR"; Text="Load error. Please rejoin the game and execute again."; Duration=5;})
+    end
+elseif string.find(tostring(output), "HttpGet is not a valid") ~= nil then
+    PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="ERROR"; Text="HttpGet missing. Please rejoin the game and execute again."; Duration=5;})
 end
