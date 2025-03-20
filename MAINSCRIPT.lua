@@ -48,15 +48,19 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.11"
-local PBH_LASTUPDATE = "16/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.0.12"
+local PBH_LASTUPDATE = "20/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.0.11 (20/3/25)]:</b>
+<font color="rgb(0, 162, 255)">Updated</font> to UI 1.6.0
+The work for the new encryption system (The reason for not updated in 2.0.11) has <font color="rgb(0, 225, 0)">completed</font>. Updates will be back on track.
+
 <b>[REWRITE: 2.0.11 (16/3/25)]:</b>
 <font color="rgb(0, 162, 255)">Fixed</font> "Virtual Executor" UI issue.
 Changed the UI path of "Virtual Executor" to CoreGui.
 <font color="rgb(0, 225, 0)">Added</font> highlighting in "Update Log".
 Seperated "Virtual Executor" and "Virtual Executor BETA".
-There will be <font color="rgb(215, 90, 74)">no</font> further updates any time soon.
+There will be <font color="rgb(215, 90, 74)">no</font> further updates any time soon. (We are working on new encryption system.)
 Script now comes with better error handeling. <font transparency="0.5">(Some times might break.)</font>
 
 <b>[REWRITE: 2.0.10 (15/3/25)]:</b>
@@ -115,7 +119,7 @@ New release of the rewritten ProBaconHub.
 local Library, Window, ProBaconFunction
 
 local success, output = pcall(function()
-    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.5.1")
+    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()(true)("UI 1.6.0")
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
     Library:toggle_ui(true)
@@ -5423,4 +5427,6 @@ elseif string.find(tostring(output), "error in error handling") ~= nil then
     end
 elseif string.find(tostring(output), "HttpGet is not a valid") ~= nil then
     PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="ERROR"; Text="HttpGet missing. Please rejoin the game and execute again."; Duration=5;})
+else
+    print("ERROR OCCURED: \n"..tostring(output))
 end
