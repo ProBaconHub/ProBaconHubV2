@@ -51,7 +51,11 @@ local SUPPORTEDGAMES = {
 local PBH_VERSION = "REWRITE: 2.0.12"
 local PBH_LASTUPDATE = "20/3/2025 (UTC)"
 local UPDATELOG = [[
-<b>[REWRITE: 2.0.11 (20/3/25)]:</b>
+<b>[REWRITE: 2.0.12.1 (20/3/25)]:</b>
+<font color="rgb(0, 162, 255)">Fixed</font> "Official Verification Failure" issue on some executors.
+<font color="rgb(0, 162, 255)">Fixed</font> some minor issues.
+
+<b>[REWRITE: 2.0.12 (20/3/25)]:</b>
 <font color="rgb(0, 162, 255)">Updated</font> to UI 1.6.0
 The work for the new encryption system (The reason for not updated in 2.0.11) has <font color="rgb(0, 225, 0)">completed</font>. Updates will be back on track.
 
