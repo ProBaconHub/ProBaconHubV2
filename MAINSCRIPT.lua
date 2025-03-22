@@ -13,6 +13,7 @@ local PROTECTED_TWEENSERVICE = cloneref(game:GetService("TweenService"))
 local PROTECTED_TELEPORTSERVICE = cloneref(game:GetService("TeleportService"))
 local PROTECTED_VIRTUALINPUTMANAGER = cloneref(game:GetService("VirtualInputManager"))
 local PROTECTED_STARTERGUI = cloneref(game:GetService("StarterGui"))
+local PROTECTED_HTTPSERVICE = cloneref(game:GetService("HttpService"))
 local setclipboard = setclipboard or print
 if getgenv().CONNECTFOLDER == nil then
     getgenv().CONNECTFOLDER = {}
@@ -121,6 +122,9 @@ Added get loaderscript.
 New release of the rewritten ProBaconHub.
 ]]
 
+local UNPACKKEY = getgenv().LINKTOUNPACKKEY
+getgenv().LINKTOUNPACKKEY = nil
+
 local Library, Window, ProBaconFunction
 
 local success, output = pcall(function()
@@ -140,8 +144,7 @@ local success, output = pcall(function()
     local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
     load_RMD:AddProgress(1)
     task.wait(0.1) --Prevent stack overflow
-    local FUNCTIONPACK_UNPACKHASH = tostring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/0afIOgw33a"))
-    getgenv().LINKTOUNPACKKEY = nil
+    local FUNCTIONPACK_UNPACKHASH = tostring(game:HttpGet(UNPACKKEY))
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
     load_RMD:AddProgress(1)
@@ -2140,7 +2143,7 @@ if success then
                 Window:NotificationBar("Pro Bacon", "Gold Block farm ended.")
             end
         end)
-        buildaboatfarm_Sec:NewWarnLabel("Do not enable both farm together!")
+        buildaboatfarm_Sec:NewWarnLabel("Do not enable both \"Gold farm\" and \"Gold Block farm\" together!")
     
         local BuildABoatPlot = {}
         for _,v in pairs(PROTECTED_WORKSPACE.Teams:GetChildren()) do
@@ -3215,6 +3218,26 @@ if success then
         local forsakenfarm_Sec = forsaken_Tab:NewSection("Farm")
         local forsakengenerator_Sec = forsaken_Tab:NewSection("Generator")
         local forsakenmod_Sec = forsaken_Tab:NewSection("Mod")
+        for _,v in getgc(true) do
+            if type(v) == "table" and rawget(v, "ReloadTime") then
+                rawset(v, "ReloadTime", 0.01)
+                rawset(v, "ReservedAmmo", 9999)
+                rawset(v, "MagSize", 999)
+            end
+            if type(v) == "table" and rawget(v, "HealTime") then
+                rawset(v, "HealTime", 0.01)
+                rawset(v, "HealAmount", 100)
+                rawset(v, "HealSpeedMultiplier", 1)
+            end
+            if type(v) == "table" and rawget(v, "CloneAmount") then
+                rawset(v, "CloneAmount", 10)
+                rawset(v, "InvisibilityTime", 20)
+            end
+            if type(v) == "table" and rawget(v, "ShootHitboxSize") then
+                rawset(v, "ShootHitboxSize", 10)
+                rawset(v, "ShootHitboxRange", 900)
+            end
+        end
         getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN = getgenv().VARIABLEFOLDER.FORSAKENCOOLDOWN or 2.75
         forsakenfarm_Sec:NewToggle("Basic Generator Farm", "This allows user to farm generators.", function(state)
             getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM = state
@@ -3305,39 +3328,19 @@ if success then
                 end
             end
         end)
-        forsakenmod_Sec:NewButton("Mod game", "This allows suer to mod their game. Such have infinite stamina and instant use item.", function()
-            for _,v in getgc(true) do
-                if type(v) == "table" and rawget(v, "ReloadTime") then
-                    rawset(v, "ReloadTime", 0.01)
-                    rawset(v, "ReservedAmmo", 9999)
-                    rawset(v, "MagSize", 999)
-                end
-                if type(v) == "table" and rawget(v, "DrinkTime") then
-                    rawset(v, "DrinkTime", 0.01)
-                    rawset(v, "DrinkSpeedMultiplier", 5)
-                    rawset(v, "SpeedLevel", 5)
-                    rawset(v, "SpeedDuration", 100)
-                end
-                if type(v) == "table" and rawget(v, "HealTime") then
-                    rawset(v, "HealTime", 0.01)
-                    rawset(v, "HealAmount", 100)
-                    rawset(v, "HealSpeedMultiplier", 1)
-                end
-                if type(v) == "table" and rawget(v, "MaxStamina") then
-                    rawset(v, "MaxStamina", math.huge)
-                    rawset(v, "StaminaGain", math.huge)
-                end
-                if type(v) == "table" and rawget(v, "CloneAmount") then
-                    rawset(v, "CloneAmount", 10)
-                    rawset(v, "InvisibilityTime", 20)
-                end
-                if type(v) == "table" and rawget(v, "ShootHitboxSize") then
-                    rawset(v, "ShootHitboxSize", 10)
-                    rawset(v, "ShootHitboxRange", 900)
-                end
-            end
-        end)
-        forsakenmod_Sec:NewWarnLabel("You could also use bypass speed boost in Local Player tab.")
+        forsakenmod_Sec:NewSlider("Max Stamina", "This slider allows user to change the maximium stamina for its character.", 0, 50000, function(var)
+            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina = var
+        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina)
+        forsakenmod_Sec:NewSlider("Stamina Gain Per Second", "This slider allows user to change the stamina gaining speed for its character.", 0, 50000, function(var)
+            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain = var
+        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain)
+        forsakenmod_Sec:NewSlider("Stamina Loss", "This slider allows user to change the stamina lossing speed for its character.", 0, 50000, function(var)
+            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss = var
+        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss)
+        forsakenmod_Sec:NewSlider("Sprinting Speed", "This slider allows user to change the sprinting speed for its character.", 16, 200, function(var)
+            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed = var
+        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed)
+        forsakenmod_Sec:NewWarnLabel("You could also check out the bypassed speed boost in Local Player tab.")
     elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
         local function isincrimbase(playername)
             local player = PROTECTED_PLAYERSERVICE[playername]
