@@ -49,9 +49,14 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.12.1"
-local PBH_LASTUPDATE = "20/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.0.13"
+local PBH_LASTUPDATE = "23/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.0.13 (23/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Improved</font> "Zap farm" in Blox Hunt.
+<font color="rgb(0, 225, 0)">Improved</font> "Genrator farm" in Forsaken.
+<font color="rgb(0, 162, 255)">Updated</font> to UI 1.6.1
+
 <b>[REWRITE: 2.0.12.1 (20/3/25)]:</b>
 <font color="rgb(0, 162, 255)">Fixed</font> "Official Verification Failure" issue on some executors.
 <font color="rgb(0, 162, 255)">Fixed</font> some minor issues.
@@ -128,7 +133,7 @@ getgenv().LINKTOUNPACKKEY = nil
 local Library, Window, ProBaconFunction
 
 local success, output = pcall(function()
-    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.6.0")
+    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.6.1")
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
     Library:toggle_ui(true)
@@ -893,7 +898,7 @@ if success then
     local HITBOXEXPAND_SIZE_MIXED = hitbox_Sec:NewSlider("Size Mixed", "This slider will change X, Y and Z at the same time soon..", 2, 100, function(var)
         getgenv().VARIABLEFOLDER.HITBOXEXPANDMIXED = var
     end, getgenv().VARIABLEFOLDER.HITBOXEXPANDMIXED)
-    hitbox_Sec:NewTextBox("Size", "This is an input box. User can input a 3 dimantional value \nExample: 5,5,5 or 5, 5, 5", function(var)
+    hitbox_Sec:NewTextBox("Size", "This is an input box. User can input a 3 dimantional value.", function(var)
         local SIZE = ProBaconFunction:StringToVector3(var)
         getgenv().VARIABLEFOLDER.HITBOXEXPANDX = SIZE.X
         getgenv().VARIABLEFOLDER.HITBOXEXPANDY = SIZE.Y
@@ -1779,9 +1784,28 @@ if success then
         local bloxhuntlobby_Sec = bloxhunt_Tab:NewSection("Lobby")
         local bloxhunhider_Sec = bloxhunt_Tab:NewSection("Hider")
         local bloxhuntseeker_Sec = bloxhunt_Tab:NewSection("Seeker")
-        bloxhuntlobby_Sec:NewButton("Token", "This allows user to get 15 tokens. \nDO NOT SPAM!", function()
-            firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.IslandObby.Token.Base, 1)
-            firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.IslandObby.Token.Base, 0)
+        bloxhuntlobby_Sec:NewButton("Token", "This allows user to get at most 60 tokens.", function()
+            if PROTECTED_PLAYERSERVICE.LocalPlayer["Player Data"].ObbyCooldown.FloatingIslandObby.Value == 0 then
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.IslandObby.Token.Base, 1)
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.IslandObby.Token.Base, 0)
+            end
+            if PROTECTED_PLAYERSERVICE.LocalPlayer["Player Data"].ObbyCooldown.AdventureObby.Value == 0 then
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.AdventureObby.Token.Base, 1)
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.AdventureObby.Token.Base, 0)
+            end
+            if PROTECTED_PLAYERSERVICE.LocalPlayer["Player Data"].ObbyCooldown.LavaIslandObby.Value == 0 then
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.LavaObby.Token.Base, 1)
+                firetouchinterest(PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"), PROTECTED_WORKSPACE.LobbyObbies.LavaObby.Token.Base, 0)
+            end
+        end)
+        bloxhuntlobby_Sec:NewButton("Token2", "This allows user to get rained tokens.", function()
+            for _,v in pairs(PROTECTED_WORKSPACE:GetChildren()) do
+                if v.Name == "Token" then
+                    local pos = v.Base.Position+Vector3.new(0, 10, 0)
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos.X, pos.Y, pos.Z)
+                    break
+                end
+            end
         end)
         local BLOXHUNTOBJECTS = {}
         for _,v in pairs(PROTECTED_REPLICATEDSTORAGE.Resources.Objects:GetChildren()) do
@@ -1791,32 +1815,68 @@ if success then
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Transform"):FireServer(obj)
         end)
         BLOXHUNTTRANSFORMDROPDOWN:SortBy("Name")
-        bloxhunhider_Sec:NewButton("Hide Random (Best use with noclip)", "This allows user to hide in random object.", function()
-            local OBJECTS = PROTECTED_WORKSPACE.LoadedMap:GetChildren()[1].Objects:GetChildren()
-            local SELECTEDOBJECT = OBJECTS[math.random(1, #OBJECTS)]
-            PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Transform"):FireServer(SELECTEDOBJECT.Name)
-            task.wait(0.5)
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = SELECTEDOBJECT.WorldPivot
-        end)
+        bloxhunhider_Sec:NewToggle("Hide Random", "This allows user to hide in random object.", function(state)
+            if state then
+                getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM = true
+                local OBJECTS = PROTECTED_WORKSPACE.LoadedMap:GetChildren()[1].Objects:GetChildren()
+                getgenv().VARIABLEFOLDER.SELECTEDOBJECT = OBJECTS[math.random(1, #OBJECTS)]
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Transform"):FireServer(getgenv().VARIABLEFOLDER.SELECTEDOBJECT.Name)
+                task.wait(0.5)
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.SELECTEDOBJECT.WorldPivot * CFrame.new(0, 50, 0)
+                getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                    if getgenv().VARIABLEFOLDER.SELECTEDOBJECT then
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.SELECTEDOBJECT.WorldPivot
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+                    elseif getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM ~= nil then
+                        getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM:Disconnect()
+                        getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM = nil
+                    end
+                end)
+            else
+                if getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM ~= nil then
+                    getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM:Disconnect()
+                    getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM = nil
+                end
+                if getgenv().VARIABLEFOLDER.SELECTEDOBJECT then
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.SELECTEDOBJECT.WorldPivot * CFrame.new(0, getgenv().VARIABLEFOLDER.SELECTEDOBJECT:GetExtentsSize().Y, 0)
+                end
+            end
+        end, {getgenv().CONNECTFOLDER.BLOXHUNTHIDERANDOM ~= nil, false})
         bloxhunhider_Sec:NewButton("Taunt", "This allows user to taunt (MAX: 4 times)", function()
             for _ = 1, 4 do
                 PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Taunt"):FireServer()
             end
         end)
         bloxhuntseeker_Sec:NewButton("Zap Farm", "This allows user to zap other players.", function()
+            local LASTCFRAME = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
             for _,v in pairs(PROTECTED_PLAYERSERVICE:GetPlayers()) do
-                while v ~= PROTECTED_PLAYERSERVICE.LocalPlayer and v.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character and v["Player Data"].Role.Value == "Hider" do
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
-                    task.wait(0.5)
-                    local args = {
-                        [1] = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart,
-                        [2] = v.Character
-                    }
-                    PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Zap"):FireServer(unpack(args))
-                    task.wait(0.5)
+                if getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM ~= nil then
+                    getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM:Disconnect()
+                    getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = nil
                 end
+                repeat
+                    task.wait(0.1)
+                until game:GetService("Players").LocalPlayer["Player Data"].GameData.Energy.Value == 100
+                getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,-10,0)
+                end)
+                while v ~= PROTECTED_PLAYERSERVICE.LocalPlayer and v.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character and v["Player Data"].Role.Value == "Hider" do
+                    PROTECTED_REPLICATEDSTORAGE:WaitForChild("Interaction"):WaitForChild("Gameplay"):WaitForChild("Zap"):FireServer(unpack({
+                        v.Character.HumanoidRootPart, --PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart,
+                        v.Character
+                    }))
+                    task.wait(0.1)
+                end
+                task.wait(0.05)
+                if getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM ~= nil then
+                    getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM:Disconnect()
+                    task.wait()
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = LASTCFRAME
+                end
+                getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = nil
             end
         end)
+        --game:GetService("Players").LocalPlayer["Player Data"].GameData.Energy
     elseif game.PlaceId == 3851622790 then --Break In Lobby
         local breakinlobby_Tab = Window:NewTab("Lobby")
         local breakinrole_Sec = breakinlobby_Tab:NewSection("Role")
@@ -2143,8 +2203,7 @@ if success then
                 Window:NotificationBar("Pro Bacon", "Gold Block farm ended.")
             end
         end)
-        buildaboatfarm_Sec:NewWarnLabel("Do not enable both \"Gold farm\" and \"Gold Block farm\" together!")
-    
+        buildaboatfarm_Sec:NewWarnLabel("Do not enable both \"Gold farm\" and \"Gold Block farm\" at the same time!")
         local BuildABoatPlot = {}
         for _,v in pairs(PROTECTED_WORKSPACE.Teams:GetChildren()) do
             if v:FindFirstChild("FlagPole") then
@@ -3251,19 +3310,10 @@ if success then
                                     if v.Name == "Generator" and getgenv().VARIABLEFOLDER.FORSAKENGENERATORFARM then
                                         if v.Progress.Value ~= 100 then
                                             PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Positions.Center.CFrame
-                                            v.Main.Prompt.HoldDuration = 0
-                                            task.wait(.1)
-                                            PROTECTED_WORKSPACE.CurrentCamera.CFrame = CFrame.lookAt(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position+Vector3.new(0,15,15), v.Instances.Generator.Progress.Position)
-                                            task.wait(.1)
-                                            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                                            task.wait(.001)
-                                            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.F, false, game)
-                                            task.wait(.1)
+                                            task.wait(.125)
+                                            v.Remotes.RF:InvokeServer("enter")
+                                            task.wait(.075)
                                             v.Remotes.RE:FireServer()
-                                            task.wait(.001)
-                                            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.W, false, game)
-                                            task.wait(.001)
-                                            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(false, Enum.KeyCode.W, false, game)
                                         end
                                     end
                                 end
@@ -3328,18 +3378,35 @@ if success then
                 end
             end
         end)
-        forsakenmod_Sec:NewSlider("Max Stamina", "This slider allows user to change the maximium stamina for its character.", 0, 50000, function(var)
-            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina = var
-        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina)
-        forsakenmod_Sec:NewSlider("Stamina Gain Per Second", "This slider allows user to change the stamina gaining speed for its character.", 0, 50000, function(var)
-            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain = var
-        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain)
-        forsakenmod_Sec:NewSlider("Stamina Loss", "This slider allows user to change the stamina lossing speed for its character.", 0, 50000, function(var)
-            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss = var
-        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss)
-        forsakenmod_Sec:NewSlider("Sprinting Speed", "This slider allows user to change the sprinting speed for its character.", 16, 200, function(var)
-            require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed = var
-        end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed)
+        local requiresuccess, _ = pcall(function()
+            forsakenmod_Sec:NewSlider("Stamina", "This slider allows user to change the stamina for its character.", 0, 5000, function(var)
+                require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).Stamina = var
+            end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).Stamina)
+            forsakenmod_Sec:NewSlider("Max Stamina", "This slider allows user to change the maximium stamina for its character.", 0, 2000, function(var)
+                require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina = var
+            end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).MaxStamina)
+            forsakenmod_Sec:NewSlider("Stamina Gain", "This slider allows user to change the stamina gaining speed for its character.", 0, 2000, function(var)
+                require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain = var
+            end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaGain)
+            forsakenmod_Sec:NewSlider("Stamina Loss", "This slider allows user to change the stamina lossing speed for its character.", 0, 100, function(var)
+                require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss = var
+            end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).StaminaLoss)
+            forsakenmod_Sec:NewSlider("Sprinting Speed", "This slider allows user to change the sprinting speed for its character.", 16, 200, function(var)
+                require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed = var
+            end, require(PROTECTED_REPLICATEDSTORAGE.Systems.Character.Game.Sprinting).SprintSpeed)
+        end)
+        if not requiresuccess then
+            forsakenmod_Sec:NewButton("Stamina", "This button allows user to have inf stamina.", function()
+                for _,v in getgc(true) do
+                    if type(v) == "table" and rawget(v, "MaxStamina") then
+                        print("Found Stamina using GC method.")
+                        rawset(v, "MaxStamina", 100)
+                        rawset(v, "StaminaGain", 100)
+                        rawset(v, "StaminaLoss", -100)
+                    end
+                end
+            end)
+        end
         forsakenmod_Sec:NewWarnLabel("You could also check out the bypassed speed boost in Local Player tab.")
     elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
         local function isincrimbase(playername)
