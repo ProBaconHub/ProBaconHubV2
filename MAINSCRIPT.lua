@@ -15,11 +15,20 @@ local PROTECTED_VIRTUALINPUTMANAGER = cloneref(game:GetService("VirtualInputMana
 local PROTECTED_STARTERGUI = cloneref(game:GetService("StarterGui"))
 local PROTECTED_HTTPSERVICE = cloneref(game:GetService("HttpService"))
 local setclipboard = setclipboard or print
+if type(getgenv().PROBACONHUBLOADID) ~= "number" then
+    getgenv().PROBACONHUBLOADID = 0
+else
+    getgenv().PROBACONHUBLOADID = getgenv().PROBACONHUBLOADID + 1
+end
 if getgenv().CONNECTFOLDER == nil then
     getgenv().CONNECTFOLDER = {}
 end
 if getgenv().VARIABLEFOLDER == nil then
     getgenv().VARIABLEFOLDER = {}
+    pcall(function()
+        getgenv().VARIABLEFOLDER = PROTECTED_HTTPSERVICE:JSONDecode(readfile("ProBaconHubV2_tEc7rNnI5d.json"))
+        warn("CONFIGLOADED")
+    end)
 end
 
 local PLAYERLIST = PROTECTED_PLAYERSERVICE:GetPlayers()
@@ -49,9 +58,17 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.0.13"
-local PBH_LASTUPDATE = "23/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.1"
+local PBH_LASTUPDATE = "24/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.1 (24/3/25)]:</b>
+<font color="rgb(0, 162, 255)">Updated</font> to UI 1.7.0
+<font color="rgb(0, 162, 255)">Updated</font> Syntax to match UI 1.7.0
+
+<b>[REWRITE: 2.1.0 (23/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Added new</font> game support: "Mad City: Chapter 2"
+<font color="rgb(0, 225, 0)">Added</font> Save config/settings <font color="rgb(0, 175, 0)">[BETA]</font>
+
 <b>[REWRITE: 2.0.13 (23/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Improved</font> "Zap farm" in Blox Hunt.
 <font color="rgb(0, 225, 0)">Improved</font> "Genrator farm" in Forsaken.
@@ -127,23 +144,31 @@ Added get loaderscript.
 New release of the rewritten ProBaconHub.
 ]]
 
-local UNPACKKEY = getgenv().LINKTOUNPACKKEY
+local UNPACKKEY = "https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/0afIOgw33a"
 getgenv().LINKTOUNPACKKEY = nil
 
 local Library, Window, ProBaconFunction
 
 local success, output = pcall(function()
-    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.6.1")
+    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.7.0")
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
     Library:toggle_ui(true)
     local LoadingTab = Window:NewTab("Loading")
     local loadingSec = LoadingTab:NewSection("", true)
-    local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 2, function()
+    local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 3, function()
         Window:NotificationBar("ProBaconHub", "Successfully loaded RMD", 1)
         task.wait(0.1)
         Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 3)
     end)
+    if getgenv().VARIABLEFOLDER == nil then
+        getgenv().VARIABLEFOLDER = {}
+        pcall(function()
+            getgenv().VARIABLEFOLDER = PROTECTED_HTTPSERVICE:JSONDecode(readfile("ProBaconHubV2_tEc7rNnI5d.json"))
+            warn("CONFIGLOADED")
+        end)
+    end
+    load_RMD:AddProgress(1)
     local unpack_functionpack = loadingSec:NewProgressBar("Unpack FunctionPack", "Unpacking ProBaconFunctionPack \nRequired.", 0, 1)
     task.wait(0.1) --Prevent stack overflow
     local FunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ProBaconFunctionPack", true))()
@@ -1509,9 +1534,12 @@ if success then
             end
         end
     end)
+    getgenv().VARIABLEFOLDER.UIWINDOWANIMATIONSPEED = getgenv().VARIABLEFOLDER.UIWINDOWANIMATIONSPEED or 100
+    Library:setanimationspeed(getgenv().VARIABLEFOLDER.UIWINDOWANIMATIONSPEED/100)
     ui_Sec:NewSlider("Animation Speed (%)", "The higher the slower", 0, 200, function(value)
+        getgenv().VARIABLEFOLDER.UIWINDOWANIMATIONSPEED = value
         Library:setanimationspeed(value/100)
-    end, 100)
+    end, getgenv().VARIABLEFOLDER.UIWINDOWANIMATIONSPEED)
     ui_Sec:NewButton("Update Log", "This button allows user to view the update log", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UpdateLog"))().UpdateLog("<font color =\"rgb(255, 218, 68)\">Please note that last update date does not mean realease date.</font>\n\n"..UPDATELOG)
     end)
@@ -2203,7 +2231,7 @@ if success then
                 Window:NotificationBar("Pro Bacon", "Gold Block farm ended.")
             end
         end)
-        buildaboatfarm_Sec:NewWarnLabel("Do not enable both \"Gold farm\" and \"Gold Block farm\" at the same time!")
+        buildaboatfarm_Sec:NewWarningLabel("Do not enable both \"Gold farm\" and \"Gold Block farm\" at the same time!")
         local BuildABoatPlot = {}
         for _,v in pairs(PROTECTED_WORKSPACE.Teams:GetChildren()) do
             if v:FindFirstChild("FlagPole") then
@@ -3407,7 +3435,7 @@ if success then
                 end
             end)
         end
-        forsakenmod_Sec:NewWarnLabel("You could also check out the bypassed speed boost in Local Player tab.")
+        forsakenmod_Sec:NewWarningLabel("You could also check out the bypassed speed boost in Local Player tab.")
     elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
         local function isincrimbase(playername)
             local player = PROTECTED_PLAYERSERVICE[playername]
@@ -4175,6 +4203,70 @@ if success then
             end
         end)
         Window:NotificationBar("Pro Bacon", "Player TP dropdown has been overwritten.", 2)
+    elseif game.PlaceId == 1224212277 then -- Mad City Chapter: 2
+        task.wait(2)
+        local MADCITYCHAPTER2FUNCTIONPACK = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
+        local madcitych2_Tab = Window:NewTab("Mad City CH2")
+        local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
+        local madcitych2farm_Tab = Window:NewTab("Auto Farm")
+        local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
+        madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
+            MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
+        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
+        madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
+            MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
+        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
+        madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
+            MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
+        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
+        madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
+            MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
+        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
+        madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. Accept the situation. We are working on a patch!\n\nMost features does not work with Xeno.")
+
+        madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
+            getgenv().Key = txt
+        end)
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP or true
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST or true
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK or false
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB or false
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT or false
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID or false
+        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE or false
+        madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Server Hop", getgenv().ServerHop}, {"Mini Heist", getgenv().MiniHeist}, {"Bank", getgenv().Bank}, {"Club", getgenv().Club}, {"Resort", getgenv().Resort}, {"Pyramid", getgenv().Pyramid}, {"Speed Mode", getgenv().SpeedMode}}, function(opt)
+            for _,v in pairs(opt) do
+                if v[1] == "Server Hop" then
+                    getgenv().ServerHop = v[2]
+                end
+                if v[1] == "Mini Heist" then
+                    getgenv().MiniHeist = v[2]
+                end
+                if v[1] == "Bank" then
+                    getgenv().Bank = v[2]
+                end
+                if v[1] == "Club" then
+                    getgenv().Club = v[2]
+                end
+                if v[1] == "Resort" then
+                    getgenv().Resort = v[2]
+                end
+                if v[1] == "Pyramid" then
+                    getgenv().Pyramid = v[2]
+                end
+                if v[1] == "Speed Mode" then
+                    getgenv().SpeedMode = v[2]
+                end
+            end
+        end)
+        madcitych2farm_Sec:NewButton("Auto Rob V3", "This button allows user to rob heist base on the settings above.", function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoRobV3"))()
+        end)
+        madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
+        end)
+        madcitych2farm_Sec:NewWarningLabel("Most features does not work with Xeno.")
+        madcitych2farm_Sec:NewErrorLabel("We disclaim all liability for account suspensions.")
     elseif game.PlaceId == 21532277 then -- Notoriety Lobby
         local notorietylobby_Tab = Window:NewTab("Notoriety")
         local notorietylobby_Sec = notorietylobby_Tab:NewSection("Lobby")
@@ -5488,6 +5580,14 @@ if success then
     if SUPPORTED then
         Window:NotificationBar("Pro Bacon", "Supported game detected", 2)
     end
+
+    coroutine.wrap(function()
+        local CURRENTID = getgenv().PROBACONHUBLOADID
+        while getgenv().PROBACONHUBLOADID == CURRENTID do
+            writefile("ProBaconHubV2_tEc7rNnI5d.json", PROTECTED_HTTPSERVICE:JSONEncode(getgenv().VARIABLEFOLDER))
+            task.wait(5)
+        end
+    end)()
 elseif string.find(tostring(output), "stack overflow") ~= nil then
     if Window then
         Window:NotificationBar("ERROR", "Stack overflow. Please close this window and execute again.")
