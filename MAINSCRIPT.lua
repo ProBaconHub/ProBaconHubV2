@@ -58,9 +58,13 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.1"
-local PBH_LASTUPDATE = "24/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.2"
+local PBH_LASTUPDATE = "25/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.2 (24/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Improved</font> some features for "Mad City: Chapter 2"
+Reduced loading freeze.
+
 <b>[REWRITE: 2.1.1 (24/3/25)]:</b>
 <font color="rgb(0, 162, 255)">Updated</font> to UI 1.7.0
 <font color="rgb(0, 162, 255)">Updated</font> Syntax to match UI 1.7.0
@@ -144,7 +148,7 @@ Added get loaderscript.
 New release of the rewritten ProBaconHub.
 ]]
 
-local UNPACKKEY = "https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/0afIOgw33a"
+local UNPACKKEY = getgenv().LINKTOUNPACKKEY
 getgenv().LINKTOUNPACKKEY = nil
 
 local Library, Window, ProBaconFunction
@@ -4222,6 +4226,9 @@ if success then
         madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
             MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
         end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
+        madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
+            MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
+        end)
         madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. Accept the situation. We are working on a patch!\n\nMost features does not work with Xeno.")
 
         madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
