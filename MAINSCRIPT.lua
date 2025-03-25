@@ -1880,8 +1880,8 @@ if success then
             end
         end)
         bloxhuntseeker_Sec:NewButton("Zap Farm", "This allows user to zap other players.", function()
-            local LASTCFRAME = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
             for _,v in pairs(PROTECTED_PLAYERSERVICE:GetPlayers()) do
+                local LASTCFRAME = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
                 if getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM ~= nil then
                     getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM:Disconnect()
                     getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = nil
@@ -1908,7 +1908,6 @@ if success then
                 getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = nil
             end
         end)
-        --game:GetService("Players").LocalPlayer["Player Data"].GameData.Energy
     elseif game.PlaceId == 3851622790 then --Break In Lobby
         local breakinlobby_Tab = Window:NewTab("Lobby")
         local breakinrole_Sec = breakinlobby_Tab:NewSection("Role")
