@@ -58,9 +58,16 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.2"
+local PBH_VERSION = "REWRITE: 2.1.3"
 local PBH_LASTUPDATE = "25/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.3 (24/3/25)]:</b>
+<font color="rgb(200, 225, 0)">Increased</font> Fly speed.
+<font color="rgb(0, 162, 255)">Balanced</font> Bypass Fly speed
+Reduced lag for mods in "Mad City: Chapter 2"
+<font color="rgb(0, 225, 0)">Improved</font> "Mad City: Chapter 2" Auto arrest speed.
+<font color="rgb(0, 225, 0)">Improved</font> "Mad City: Chapter 2" Auto rob Club success rate.
+
 <b>[REWRITE: 2.1.2 (24/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Improved</font> some features for "Mad City: Chapter 2"
 Reduced loading freeze.
@@ -356,7 +363,7 @@ if success then
     end)
     
     getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED = getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED or 5
-    playerflight_Sec:NewSlider("Fly Speed", "The higher, the faster", 1, 500, function(value)
+    playerflight_Sec:NewSlider("Fly Speed", "The higher, the faster", 1, 1000, function(value)
         getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED = value
     end, getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED)
     playerflight_Sec:NewToggle("Fly", "Neglect gravity.", function(state)
@@ -433,7 +440,7 @@ if success then
                 getgenv().CONNECTFOLDER.BYPASSEDFLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
                     PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
                     if PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Magnitude > 0.1 then
-                        BYPASSEDFLIGHTCFRAME = BYPASSEDFLIGHTCFRAME + PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector) * (getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED/10) + PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector) * (getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED/10)
+                        BYPASSEDFLIGHTCFRAME = BYPASSEDFLIGHTCFRAME + PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.RightVector) * (getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED/75) + PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector * PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.MoveDirection.Unit:Dot(PROTECTED_WORKSPACE.CurrentCamera.CFrame.LookVector) * (getgenv().VARIABLEFOLDER.PROBACONFLIGHTSPEED/75)
                     end
                     PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(BYPASSEDFLIGHTCFRAME.X,BYPASSEDFLIGHTCFRAME.Y,BYPASSEDFLIGHTCFRAME.Z)
                     PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
@@ -4228,7 +4235,7 @@ if success then
         madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
             MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
         end)
-        madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. Accept the situation. We are working on a patch!\n\nMost features does not work with Xeno.")
+        madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
 
         madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
             getgenv().Key = txt
