@@ -58,10 +58,13 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.3"
-local PBH_LASTUPDATE = "25/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.4"
+local PBH_LASTUPDATE = "26/3/2025 (UTC)"
 local UPDATELOG = [[
-<b>[REWRITE: 2.1.3 (24/3/25)]:</b>
+<b>[REWRITE: 2.1.4 (26/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Added new</font> "Silent Aim" in "Mad City: Chapter 2"
+
+<b>[REWRITE: 2.1.3 (25/3/25)]:</b>
 <font color="rgb(200, 225, 0)">Increased</font> Fly speed.
 <font color="rgb(0, 162, 255)">Balanced</font> Bypass Fly speed
 Reduced lag for mods in "Mad City: Chapter 2"
@@ -4220,6 +4223,9 @@ if success then
         local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
         local madcitych2farm_Tab = Window:NewTab("Auto Farm")
         local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
+        getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
+        getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
         madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
             MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
         end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
@@ -4229,6 +4235,12 @@ if success then
         madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
             MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
         end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
+        madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
+            getgenv().ProBaconHubMadCitySilentAimEnabled = state
+        end)
+        madcitych2_Sec:NewDropdown("Aim Parts", "Choose a body part to aim at.", {"Head", "HumanoidRootPart", "UpperTorso"}, function(opt)
+            getgenv().ProBaconHubMadCitySilentAimTargetPart = opt
+        end)
         madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
             MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
         end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
