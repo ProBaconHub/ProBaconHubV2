@@ -10,13 +10,14 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconH
 - Build a Boat
 - Build and Survive! Classic
 - Cart Ride Into Rdite
-- City Life   
+- City Life
 - Destruction Simulator
-- Depthless RPG 
-- Flag Wars    
+- Depthless RPG
+- Flag Wars
 - Flee the Facility
 - Forsaken
-- Mad City CH1
+- Mad City: Chapter 1
+- Mad City: Chapter 2
 - Notoriety
 - Sonic Speed Sim
 - TLOTBS RPG
