@@ -3,7 +3,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/LOADER.lua"))()
 ```
 
-### Supported games [9/3/2025]
+### Supported games [28/3/2025]
 - Base Battles!
 - Blox Hunt
 - Break In (Story)
