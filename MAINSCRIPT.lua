@@ -30,7 +30,6 @@ if getgenv().VARIABLEFOLDER == nil then
         warn("CONFIGLOADED")
     end)
 end
-
 local PLAYERLIST = PROTECTED_PLAYERSERVICE:GetPlayers()
 PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
     PLAYERLIST = PROTECTED_PLAYERSERVICE:GetPlayers()
@@ -58,9 +57,13 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.5"
-local PBH_LASTUPDATE = "27/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.6"
+local PBH_LASTUPDATE = "28/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.6 (28/3/25)]:</b>
+Optimized script.
+<font color="rgb(0, 225, 0)">Added</font> simple UNC check for common required UNC functions.
+
 <b>[REWRITE: 2.1.5 (27/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Fixed</font> some scripts in "Mad City: Chapter 1".
 <font color="rgb(0, 225, 0)">Added</font> more quest farm in "Sonic Speed Simulator".
@@ -165,16 +168,17 @@ New release of the rewritten ProBaconHub.
 local UNPACKKEY = getgenv().LINKTOUNPACKKEY
 getgenv().LINKTOUNPACKKEY = nil
 
-local Library, Window, ProBaconFunction
+local Library, Window, ProBaconFunction, ProBaconUncCheck
 
 local success, output = pcall(function()
     Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.7.0")
+    task.wait(0.1)
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
     Library:toggle_ui(true)
     local LoadingTab = Window:NewTab("Loading")
     local loadingSec = LoadingTab:NewSection("", true)
-    local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 3, function()
+    local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 4, function()
         Window:NotificationBar("ProBaconHub", "Successfully loaded RMD", 1)
         task.wait(0.1)
         Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 3)
@@ -195,6 +199,8 @@ local success, output = pcall(function()
     local FUNCTIONPACK_UNPACKHASH = tostring(game:HttpGet(UNPACKKEY))
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
+    load_RMD:AddProgress(1)
+    ProBaconUncCheck = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UNC_CHECK"))()
     load_RMD:AddProgress(1)
     task.wait(0.5)
     LoadingTab:Destroy()
@@ -1594,6 +1600,9 @@ if success then
     end)
     extrascripts_Sec:NewButton("Super Ring", "This script allows player to make all unanchored parts in game circle around the player, forming a ring. \nThis id done by applying velocity to the unanchored parts, making them float to the ring's position.", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/superringbackup"))()
+    end)
+    extrascripts_Sec:NewButton("Check most common UNC", "This UNC validation script reliably verifies the authenticity and non-spoofability of specified UNC functions of the user's executor.", function()
+        ProBaconUncCheck.CHECK_UNC()
     end)
     
     local NOTORIETY_HEIST_TABLE = {
@@ -3456,626 +3465,99 @@ if success then
         end
         forsakenmod_Sec:NewWarningLabel("You could also check out the bypassed speed boost in Local Player tab.")
     elseif game.PlaceId == 91282350711571 then -- Mad City Chapter: 1
-        local function isincrimbase(playername)
-            local player = PROTECTED_PLAYERSERVICE[playername]
-            local character = player.character
-            local lp = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
-            local humanoidRootPart
-            if character then
-                humanoidRootPart = character.HumanoidRootPart
-            else
-                return true
-            end
-            local raycastParams = RaycastParams.new()
-            raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-            raycastParams.FilterDescendantsInstances = {lp, character, PROTECTED_WORKSPACE.Ignore} -- Exclude the player's character from the raycast
-            local raycastResult = PROTECTED_WORKSPACE:Raycast(
-                humanoidRootPart.Position,
-                Vector3.new(0, 1000, 0),
-                raycastParams
-            )
-            l = false
-            if raycastResult then
-                local hitPart = raycastResult.Instance
-                for i, v in pairs(PROTECTED_WORKSPACE.CriminalBase1:GetDescendants()) do
-                    if v.Name == hitPart.Name then
-                        l = true
-                        break
-                    else
-                        l = false
-                    end
-                end
-            end
-            return l
-        end
-        local function CheckArrestable(Player)
-            if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" and not isincrimbase(Player) then
-                return true
-            else
-                return false
-            end
-        end
-        getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Tween"
-        local function BypassTP(x, y, z, tpmethod)
-            if tpmethod == nil then
-                tpmethod = getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD
-            end
-            if tpmethod == "Tween" then
-                ProBaconFunction:VelocityTeleport(x, y, z, 1500)
-            end
-            if tpmethod == "Instant" then
-                PROTECTED_PLAYERSERVICE.LocalPlayer.CriminalMarker.Value = false
-                local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
-                tpbypass.Transparency, tpbypass.CanCollide = 1, false
-                tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                task.wait()
-                PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
-                tpbypass.Transparency, tpbypass.CanCollide = 0, true
-            end
-            for _ = 1, 100 do
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
-                task.wait()
-            end
-        end
-        local function Touchy(path, t)
-            pcall(function()
-                local pos = path.CFrame
-                local i, m = 0
-                if t == nil then
-                    m = 1
+        local function LOAD_MADCITY_CH1()
+            local function isincrimbase(playername)
+                local player = PROTECTED_PLAYERSERVICE[playername]
+                local character = player.character
+                local lp = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
+                local humanoidRootPart
+                if character then
+                    humanoidRootPart = character.HumanoidRootPart
                 else
-                    m = t
-                end
-                repeat
-                    path.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                    task.wait(0.1)
-                    i = i + 0.1
-                until i >= m
-                path.CFrame = pos
-                --firetouchinterest(path,PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"),0)
-                --firetouchinterest(path,PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"),1)
-            end)
-        end
-        local function SpawnVehicle(name)
-            local vehicletoget = PROTECTED_WORKSPACE.ObjectSelection[name]
-            local _, boudingvector3 = vehicletoget:GetBoundingBox()
-            vehicletoget:SetPrimaryPartCFrame(CFrame.new(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.x, PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.y+(boudingvector3.y/2), PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.z))
-            vehicletoget.PrimaryPart.Anchored = true
-            task.wait(.05)
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = vehicletoget.DriveSeat.CFrame*CFrame.new(0,2,0)
-            task.wait(.25)
-            vehicletoget.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
-            vehicletoget.PrimaryPart.Anchored = false
-        end
-        local function isEnemyTeam(player)
-            if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" and PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heroes" then
-                if player.Team.Name == "Police" or player.Team.Name == "Heroes" then
                     return true
                 end
-            else
-                if player.Team.Name ~= "Police" and player.Team.Name ~= "Heroes" then
-                    return true
-                end
-            end
-            return false
-        end
-    
-        local checkbypassmethod_Tab = Window:NewTab("Checking...")
-        local checkbypassmethod_Sec = checkbypassmethod_Tab:NewSection("Check", true)
-        local checkbypassmethodprogressbar = checkbypassmethod_Sec:NewProgressBar("Checking bypass method...", "Bypass method allows user to teleport instantly.", 0, 2)
-        local checkpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-        coroutine.wrap(function()
-            BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Instant")
-            checkbypassmethodprogressbar:AddProgress(1)
-        end)()
-        if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
-            repeat
-                task.wait(.01)
-            until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency ~= 1
-            repeat
-                task.wait(.01)
-            until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency == 1
-        else
-            task.wait(0.5)
-        end
-        task.wait(.5)
-        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = true
-        if (PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1048, 18, -492)).Magnitude > 5 then
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
-            getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Instant"
-            PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Teleportation bypass available!"; Duration=5;})
-        else
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
-            BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Tween")
-        end
-        checkbypassmethodprogressbar:AddProgress(1)
-        checkbypassmethod_Tab:Destroy()
-    
-        local madcitych1autofarm_Tab = Window:NewTab("Anto Farm")
-        local madcitych1items_Tab = Window:NewTab("Items")
-        local madcitych1combat_Tab = Window:NewTab("Mad City Combat")
-        local madcitych1teleport_Tab = Window:NewTab("Mad Teleport")
-        local madcitych1autofarm_Sec = madcitych1autofarm_Tab:NewSection("Auto Farm")
-        local madcitych1getitems_Sec = madcitych1items_Tab:NewSection("Get Items")
-        local madcitych1combat_Sec = madcitych1combat_Tab:NewSection("Combat")
-        local madcitych1bypassmethod_Sec = madcitych1teleport_Tab:NewSection("Bypass method")
-        local madcitych1teleport_Sec = madcitych1teleport_Tab:NewSection("Teleport")
-        madcitych1autofarm_Sec:NewButton("Auto Rob", "Mini heist", function()
-            if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
-                PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
-            end
-            if PROTECTED_PLAYERSERVICE.LocalPlayer:FindFirstChild("LowerTorso") then
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.LowerTorso:Destroy()
-            end
-            local function robit(path)
-                repeat
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = path.Parent.Parent.CFrame*CFrame.new(0,2,0)
-                    task.wait()
-                    path:FireServer()
-                until path.Parent.Parent.Name == "Nope"
-            end
-            for i, v in ipairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
-                if v.Name == "Cash" and v:FindFirstChild("Cash") and v.Cash.Cash and v.Cash.Cash.Event then
-                    print("FoundCash")
-                    robit(v.Cash.Cash.Event)
-                end
-                if v.Name == "Laptop" and v:FindFirstChild("Steal") and v.Steal.Steal and v.Steal.Steal.Event then
-                    print("FoundLaptop")
-                    robit(v.Steal.Steal.Event)
-                end
-                if v.Name == "Luggage" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
-                    print("FoundLuggage")
-                    robit(v.SmashCash.SmashCash.Event)
-                end
-                if v.Name == "Phone" and v:FindFirstChild("Steal") and v.Steal.Steal and v.Steal.Steal.Event then
-                    print("FoundPhone")
-                    robit(v.Steal.Steal.Event)
-                end
-                if v.Name == "DiamondBox" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
-                    print("FoundDiamondBox")
-                    robit(v.SmashCash.SmashCash.Event)
-                end
-                if v.Name == "CashRegister" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
-                    print("FoundCashRegister")
-                    robit(v.SmashCash.SmashCash.Event)
-                end
-                if v.Name == "Safe" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
-                    print("FoundSafe")
-                    robit(v.SmashCash.SmashCash.Event)
-                end
-                if v.Name == "ATM" and v:FindFirstChild("ATM") and v.ATM.ATM and v.ATM.ATM.Event then
-                    print("FoundATM")
-                    robit(v.ATM.ATM.Event)
-                end
-                if v.Name == "TV" and v:FindFirstChild("StealTV") and v.StealTV.StealTV and v.StealTV.StealTV.Event then
-                    print("FoundTV")
-                    robit(v.StealTV.StealTV.Event)
-                end
-                if v.Name == "TipJar" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
-                    print("FoundTipJar")
-                    robit(v.SmashCash.SmashCash.Event)
-                end
-            end
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.UpperTorso:Destroy()
-        end)
-        madcitych1autofarm_Sec:NewButton("Auto Heist (Criminal)", "Do heists", function()
-            if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" or PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heros" then
-                if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value then
-                    print("Jewl")
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" then
-                        while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Prisoners" do
-                            PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
-                            PROTECTED_RUNSERVICE.Heartbeat:Wait()
-                        end
-                    end
-                    while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" do
-                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0,100,0)
-                        PROTECTED_RUNSERVICE.Heartbeat:Wait()
-                    end
-                    coroutine.wrap(function()
-                        repeat
-                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = PROTECTED_WORKSPACE.JewelryStore.JewelryVent.Vent.CFrame
-                            task.wait(.0001)
-                        until PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Robbing.Value or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value
-                    end)()
-                    for i,v in pairs(PROTECTED_WORKSPACE.JewelryStore.JewelryBoxes:GetChildren()) do
-                        if v.Name == "JewelBox" then
-                            PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                            PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                            PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                        end
-                    end
-                    repeat
-                        task.wait(.01)
-                    until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$5000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
-                    task.wait(.5)
-                    PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value = true
-                end
-                if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value then
-                    print("Bank")
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                    BypassTP(674, 85, 564)
-                    task.wait(.5)
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(681, 84, 585)
-                    repeat
-                        task.wait(0.1)
-                    until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$3000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
-                    task.wait(.5)
-                    PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value = true
-                end
-                if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value then
-                    print("Casino")
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                    if PROTECTED_WORKSPACE.ObjectSelection.HackComputer:FindFirstChild("HackComputer") then
-                        BypassTP(1697, 38, 746)
-                        task.wait(.1)
-                        PROTECTED_WORKSPACE.ObjectSelection.HackComputer.HackComputer.HackComputer.Event:FireServer()
-                        task.wait(.01)
-                    end
-                    for i,v in pairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
-                        if v.Name == "Lever1" or v.Name == "Lever2" or v.Name == "Lever3" or v.Name == "Lever4" then
-                            if not v.Open.Value then
-                                BypassTP(v.Lever.Position.x, v.Lever.Position.y, v.Lever.Position.z)
-                                task.wait(.01)
-                                v.Lever.Lever.Event:FireServer()
-                                task.wait(.01)
-                            end
-                        end
-                    end
-                    BypassTP(1696, 41, 519)
-                    repeat
-                        task.wait(0.1)
-                    until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$4000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
-                    task.wait(.5)
-                    PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value = true
-                end
-                if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value then
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                    Touchy(PROTECTED_WORKSPACE.Pyramid.Tele.Core1)
-                    task.wait(.5)
-                    BypassTP(1000, 51080, 540)
-                    repeat
-                        task.wait(0.1)
-                    until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$7500" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
-                    Touchy(PROTECTED_WORKSPACE.Pyramid.Tele.Core2)
-                    task.wait(1)
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 50, 0)
-                    PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value = true
-                end
-                if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value then
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                    Touchy(PROTECTED_WORKSPACE.Club.TouchStart)
-                    BypassTP(1328, 145, -129)
-                    repeat
-                        task.wait(0.1)
-                    until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$6000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
-                    task.wait(.5)
-                    PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value = true
-                end
-            end
-            BypassTP(2131, 26, 418)
-            task.wait(1)
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Health = 0
-        end)
-        madcitych1autofarm_Sec:NewButton("Auto Arrest (Police)", "Arrest Crimnal and Villans", function()
-            function CheckArrestable(Player, prisoners)
-                if prisoners then
-                    if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" then
-                        return true
-                    else
-                        return false
-                    end
-                else
-                    if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" then
-                        return true
-                    else
-                        return false
-                    end
-                end
-            end
-            --[[
-            PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
-            repeat
-                task.wait(1)
-            until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")]]
-            PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Police")
-            repeat
-                task.wait(1)
-            until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("LowerTorso")
-            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("LowerTorso") then
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.LowerTorso:Destroy()
-            end
-            task.wait(0.5)
-            for _, v in pairs(PROTECTED_PLAYERSERVICE:GetPlayers()) do
-                if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
-                end
-                if CheckArrestable(v) then
-                    for _ = 1, 200 do
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
-                            local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
-                            Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
-                        end
-                        if v.Team.Name == "Prisoners" then
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                raycastParams.FilterDescendantsInstances = {lp, character, PROTECTED_WORKSPACE.Ignore} -- Exclude the player's character from the raycast
+                local raycastResult = PROTECTED_WORKSPACE:Raycast(
+                    humanoidRootPart.Position,
+                    Vector3.new(0, 1000, 0),
+                    raycastParams
+                )
+                l = false
+                if raycastResult then
+                    local hitPart = raycastResult.Instance
+                    for i, v in pairs(PROTECTED_WORKSPACE.CriminalBase1:GetDescendants()) do
+                        if v.Name == hitPart.Name then
+                            l = true
                             break
+                        else
+                            l = false
                         end
-                        local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
-                        tpbypass.Transparency, tpbypass.CanCollide = 1, false
-                        tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                        task.wait()
-                        PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
-                        tpbypass.Transparency, tpbypass.CanCollide = 0, true
-                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
-                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = v.Character.HumanoidRootPart.Velocity
-                        PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", v)
-                        PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Arrest", v)
-                        task.wait()
                     end
                 end
+                return l
             end
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.UpperTorso:Destroy()
-        end)
-        madcitych1autofarm_Sec:NewButton("Xp Farm (Police, Laggy)", "Leave game to stop", function()
-            PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
-            repeat
-                task.wait(1)
-            until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    
-            PROTECTED_PLAYERSERVICE.LocalPlayer.CharacterAdded:Connect(function()
-                task.wait(1)
-                if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
+            local function CheckArrestable(Player)
+                if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" and not isincrimbase(Player) then
+                    return true
+                else
+                    return false
                 end
-                local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
-                tpbypass.Transparency, tpbypass.CanCollide = 1, false
-                tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                task.wait()
-                PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
-                tpbypass.Transparency, tpbypass.CanCollide = 0, true
-                for i = 1, 150 do
-                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1848, 75, -1314)
+            end
+            getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Tween"
+            local function BypassTP(x, y, z, tpmethod)
+                if tpmethod == nil then
+                    tpmethod = getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD
+                end
+                if tpmethod == "Tween" then
+                    ProBaconFunction:VelocityTeleport(x, y, z, 1500)
+                end
+                if tpmethod == "Instant" then
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.CriminalMarker.Value = false
+                    local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
+                    tpbypass.Transparency, tpbypass.CanCollide = 1, false
+                    tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                    task.wait()
+                    PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
+                    tpbypass.Transparency, tpbypass.CanCollide = 0, true
+                end
+                for _ = 1, 100 do
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
                     task.wait()
                 end
-                local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
-                Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
-                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
-                PROTECTED_RUNSERVICE.RenderStepped:Connect(function()
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+            end
+            local function Touchy(path, t)
+                pcall(function()
+                    local pos = path.CFrame
+                    local i, m = 0
+                    if t == nil then
+                        m = 1
+                    else
+                        m = t
+                    end
+                    repeat
+                        path.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                        task.wait(0.1)
+                        i = i + 0.1
+                    until i >= m
+                    path.CFrame = pos
+                    --firetouchinterest(path,PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"),0)
+                    --firetouchinterest(path,PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart"),1)
                 end)
-            end)
-    
-            PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Police")
-        end)
-        madcitych1autofarm_Sec:NewToggle("Xp Farm (Light)", "Leave game to stop", function(state)
-            if state then
-                getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
-                        local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
-                        Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
-                        PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
-                    end
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Handcuffs") then
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                        end
-                    end
-                end)
-            elseif getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT ~= nil then
-                getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT:Disconnect()
-                getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT = nil
             end
-        end)
-        madcitych1autofarm_Sec:NewToggle("Xp Farm (Super Light)", "This allows user to gain XP fast.", function(state)
-            if state then
-                getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
-                        local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
-                        Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
-                        PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
-                    end
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Handcuffs") then
-                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
-                        end
-                    end
-                end)
-            elseif getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT ~= nil then
-                getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT:Disconnect()
-                getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT = nil
+            local function SpawnVehicle(name)
+                local vehicletoget = PROTECTED_WORKSPACE.ObjectSelection[name]
+                local _, boudingvector3 = vehicletoget:GetBoundingBox()
+                vehicletoget:SetPrimaryPartCFrame(CFrame.new(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.x, PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.y+(boudingvector3.y/2), PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame.z))
+                vehicletoget.PrimaryPart.Anchored = true
+                task.wait(.05)
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = vehicletoget.DriveSeat.CFrame*CFrame.new(0,2,0)
+                task.wait(.25)
+                vehicletoget.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
+                vehicletoget.PrimaryPart.Anchored = false
             end
-        end, {getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT ~= nil, false})
-    
-    
-        madcitych1getitems_Sec:NewButton("Pickpocket (Keycard)", "Pickpocket a cop", function()
-            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Pickpocket", PROTECTED_PLAYERSERVICE.LocalPlayer)
-        end)
-        madcitych1getitems_Sec:NewButton("Get Lazerblade", "To the mystery light", function()
-            local silverykey = PROTECTED_WORKSPACE.ObjectSelection.SilverKey
-            if silverykey:FindFirstChild("Nope") then
-                silverykey.Nope.SilverKey.Event:FireServer()
-            else
-                silverykey.SilverKey.SilverKey.Event:FireServer()
-            end
-            for _ = 1, 100 do
-                if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Lazerblade") then
-                    break
-                end
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1738, 28, 2136)
-                PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild("Lazerblade"):WaitForChild("Lazerblade"):WaitForChild("Lazerblade"):WaitForChild("Event"):FireServer()
-                task.wait()
-            end
-        end)
-        madcitych1getitems_Sec:NewButton("Jetpack", "Get jetpack", function()
-            local bosskey = PROTECTED_WORKSPACE.ObjectSelection.BossKey
-            if bosskey:FindFirstChild("Nope") then
-                bosskey.Nope.BossKey.Event:FireServer()
-            else
-                bosskey.BossKey.BossKey.Event:FireServer()
-            end
-            for _ = 1, 100 do
-                if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Jetpack") then
-                    break
-                end
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2183.76685, 32.7128277, -1554.86902)
-                PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild("TakeJetpack"):WaitForChild("TakeJetpack"):WaitForChild("TakeJetpack"):WaitForChild("Event"):FireServer()
-                task.wait()
-            end
-        end)
-        madcitych1getitems_Sec:NewDropdown("GetPower", "Shift to use power", {"Hotrod", "Frostbite", "Voltron", "Proton", "Vanta", "Archer"}, function(powerOption)
-            if powerOption == "Hotrod" then powerOption = "TheFlash"end
-            if powerOption == "Frostbite" then powerOption = "Chill" end
-            if powerOption == "Voltron" then powerOption = "Tesla" end
-            if powerOption == "Proton" then powerOption = "LaserPower" end
-            if powerOption == "Vanta" then powerOption = "Shadow" end
-            local powerValue = Instance.new("StringValue", PROTECTED_PLAYERSERVICE.LocalPlayer.Character)
-            powerValue.Name = "SuperPower"
-            powerValue.Value = powerOption
-        end)
-        madcitych1getitems_Sec:NewButton("Unlock all vehicles (Not in spawn menu, info for more", "This unlock only unlocks vehicle on map and also the UFO \n Unfortunately, you cant spawn them.", function()
-            for _, v in getgc(true) do
-                if type(v) == "table" and rawget(v, 1) == "Camaro" then
-                    print('found')
-                    for _, vehicle in pairs(PROTECTED_REPLICATEDSTORAGE.ItemDatabase.Vehicles:GetChildren()) do
-                        table.insert(v, vehicle.Name)
-                    end
-                end
-            end
-        end)
-        local vehiclelist = {}
-        for _, v in pairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
-            if v:FindFirstChild("DriveSeat") and string.find(v.Name, "'s Vehicle") == nil and table.find(vehiclelist, v.Name) == nil then
-                print("Found Vehicle: ", v.Name)
-                table.insert(vehiclelist, v.Name)
-            end
-        end
-        table.sort(vehiclelist)
-        local lastvehicleinput
-        madcitych1getitems_Sec:NewDropdown("Get Vehicle", "Free vehicle", vehiclelist, function(currentOption)
-            lastvehicleinput = currentOption
-            SpawnVehicle(currentOption)
-        end)
-        madcitych1getitems_Sec:NewTextBox("Vehicle", "Get vehicle by input", function(txt)
-            if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(txt) then
-                if PROTECTED_WORKSPACE.ObjectSelection[txt]:FindFirstChild("DriveSeat") and string.find(PROTECTED_WORKSPACE.ObjectSelection[txt].Name, "'s Vehicle") == nil then
-                    lastvehicleinput = txt
-                    SpawnVehicle(txt)
-                end
-            end
-        end)
-        madcitych1getitems_Sec:NewButton("Spawn Again", "Spawn vehicle without inputing again", function()
-            SpawnVehicle(lastvehicleinput)
-        end)
-        madcitych1getitems_Sec:NewButton("Escape Stuck in Vehicle", "Remove your vehicle", function()
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Sit = false
-            task.wait()
-            PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):Destroy()
-        end)
-        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.ChildRemoved:Connect(function(child)
-            if child:IsA("LocalScript") then
-                for _,v in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:GetChildren()) do
-                    if v.Name == "ProBaconMissileMod" then
-                        v:Destroy()
-                    end
-                end
-            end
-        end)
-    
-        madcitych1combat_Sec:NewButton("Missile Mod", "Mod missles", function()
-            for _,v in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:GetChildren()) do
-                if v:FindFirstChild("Car") and v.Name ~= "ProBaconMissileMod" then
-                    local vehiclescript = v:Clone()
-                    vehiclescript.Name = "ProBaconMissileMod"
-                    vehiclescript.Parent = v.Parent
-                end
-            end
-        end)
-        madcitych1combat_Sec:NewButton("Mod Air", "Mod air vehicles", function()
-            for i,v in next, getgc(true) do
-                if type(v) == "table" and rawget(v, "Missiles") then
-                    v.MissileCooldown = 0
-                    --v.MissileTargetRange = 2000
-                    v.MissileLock = 0.01
-                end
-            end
-        end)
-        madcitych1combat_Sec:NewButton("Mod Ground Vehicles", "Mod cars", function()
-            for i,v in next, getgc(true) do
-                if type(v) == "table" and rawget(v, "MaxSpeed") then
-                    rawset(v, "TurretFireRate", 0.3)
-                    rawset(v, "MaxSpeed", 500)
-                    rawset(v, "HoverHitWater", true)
-                    rawset(v, "CanTurnHoverMode", true)
-                    rawset(v, "StartTime", 0)
-                end
-            end
-        end)
-        madcitych1combat_Sec:NewButton("Mod Weapons", "Mod Weapons", function()
-            for _,q in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:GetChildren()) do
-                if q.Name~= "Phone" and q:IsA("Tool") and q:FindFirstChildWhichIsA("LocalScript") then
-                    local dupecount = 0
-                    for _, v in pairs(q:GetChildren()) do
-                        if v:IsA("LocalScript") then
-                            dupecount = dupecount + 1
-                        end
-                    end
-                    print(dupecount)
-                    if dupecount == 1 then
-                        for _ = 1, 9 do
-                            local dupe = q:FindFirstChildWhichIsA("LocalScript"):Clone()
-                            dupe.Parent = q
-                        end
-                    end
-                end
-            end
-        end)
-        madcitych1combat_Sec:NewToggle("Kill Aura", "Kill enemy nearby", function(state)
-            if state then
-                getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
-                    for _, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
-                        if v.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                            if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (v.Character.HumanoidRootPart.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 7 and isEnemyTeam(v) and v.Character.Humanoid.Health > 0 then
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
-                            end
-                        end
-                    end
-                end)
-            elseif getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA ~= nil then
-                getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA:Disconnect()
-                getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA = nil
-            end
-        end, {getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA ~= nil, false})
-        madcitych1combat_Sec:NewToggle("Loop Kill Enemy (On Vehicle)", "You must be on a vehice with missiles", function(state)
-            getgenv().MadLoopKillEnemy = state
-            function isEnemyTeam(player)
+            local function isEnemyTeam(player)
                 if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" and PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heroes" then
                     if player.Team.Name == "Police" or player.Team.Name == "Heroes" then
                         return true
@@ -4087,32 +3569,522 @@ if success then
                 end
                 return false
             end
-            while getgenv().MadLoopKillEnemy and task.wait(.01) do
-                for _, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
-                    if v.Character then
-                        if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChildOfClass("Humanoid") and isEnemyTeam(v) then
-                            if v.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
-                                local args = {
-                                    [1] = "BM",
-                                    [2] = Vector3.new(v.Character.HumanoidRootPart.Position.x, v.Character.HumanoidRootPart.Position.y, v.Character.HumanoidRootPart.Position.z)
-                                }
-                                PROTECTED_REPLICATEDSTORAGE:WaitForChild("Event"):FireServer(unpack(args))
-                                task.wait()
+        
+            local checkbypassmethod_Tab = Window:NewTab("Checking...")
+            local checkbypassmethod_Sec = checkbypassmethod_Tab:NewSection("Check", true)
+            local checkbypassmethodprogressbar = checkbypassmethod_Sec:NewProgressBar("Checking bypass method...", "Bypass method allows user to teleport instantly.", 0, 2)
+            local checkpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+            coroutine.wrap(function()
+                BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Instant")
+                checkbypassmethodprogressbar:AddProgress(1)
+            end)()
+            if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
+                repeat
+                    task.wait(.01)
+                until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency ~= 1
+                repeat
+                    task.wait(.01)
+                until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency == 1
+            else
+                task.wait(0.5)
+            end
+            task.wait(.5)
+            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+            if (PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1048, 18, -492)).Magnitude > 5 then
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+                getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Instant"
+                PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Teleportation bypass available!"; Duration=5;})
+            else
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+                BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Tween")
+            end
+            checkbypassmethodprogressbar:AddProgress(1)
+            checkbypassmethod_Tab:Destroy()
+        
+            local madcitych1autofarm_Tab = Window:NewTab("Anto Farm")
+            local madcitych1items_Tab = Window:NewTab("Items")
+            local madcitych1combat_Tab = Window:NewTab("Mad City Combat")
+            local madcitych1teleport_Tab = Window:NewTab("Mad Teleport")
+            local madcitych1autofarm_Sec = madcitych1autofarm_Tab:NewSection("Auto Farm")
+            local madcitych1getitems_Sec = madcitych1items_Tab:NewSection("Get Items")
+            local madcitych1combat_Sec = madcitych1combat_Tab:NewSection("Combat")
+            local madcitych1bypassmethod_Sec = madcitych1teleport_Tab:NewSection("Bypass method")
+            local madcitych1teleport_Sec = madcitych1teleport_Tab:NewSection("Teleport")
+            madcitych1autofarm_Sec:NewButton("Auto Rob", "Mini heist", function()
+                if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
+                end
+                if PROTECTED_PLAYERSERVICE.LocalPlayer:FindFirstChild("LowerTorso") then
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.LowerTorso:Destroy()
+                end
+                local function robit(path)
+                    repeat
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = path.Parent.Parent.CFrame*CFrame.new(0,2,0)
+                        task.wait()
+                        path:FireServer()
+                    until path.Parent.Parent.Name == "Nope"
+                end
+                for i, v in ipairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
+                    if v.Name == "Cash" and v:FindFirstChild("Cash") and v.Cash.Cash and v.Cash.Cash.Event then
+                        print("FoundCash")
+                        robit(v.Cash.Cash.Event)
+                    end
+                    if v.Name == "Laptop" and v:FindFirstChild("Steal") and v.Steal.Steal and v.Steal.Steal.Event then
+                        print("FoundLaptop")
+                        robit(v.Steal.Steal.Event)
+                    end
+                    if v.Name == "Luggage" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
+                        print("FoundLuggage")
+                        robit(v.SmashCash.SmashCash.Event)
+                    end
+                    if v.Name == "Phone" and v:FindFirstChild("Steal") and v.Steal.Steal and v.Steal.Steal.Event then
+                        print("FoundPhone")
+                        robit(v.Steal.Steal.Event)
+                    end
+                    if v.Name == "DiamondBox" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
+                        print("FoundDiamondBox")
+                        robit(v.SmashCash.SmashCash.Event)
+                    end
+                    if v.Name == "CashRegister" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
+                        print("FoundCashRegister")
+                        robit(v.SmashCash.SmashCash.Event)
+                    end
+                    if v.Name == "Safe" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
+                        print("FoundSafe")
+                        robit(v.SmashCash.SmashCash.Event)
+                    end
+                    if v.Name == "ATM" and v:FindFirstChild("ATM") and v.ATM.ATM and v.ATM.ATM.Event then
+                        print("FoundATM")
+                        robit(v.ATM.ATM.Event)
+                    end
+                    if v.Name == "TV" and v:FindFirstChild("StealTV") and v.StealTV.StealTV and v.StealTV.StealTV.Event then
+                        print("FoundTV")
+                        robit(v.StealTV.StealTV.Event)
+                    end
+                    if v.Name == "TipJar" and v:FindFirstChild("SmashCash") and v.SmashCash.SmashCash and v.SmashCash.SmashCash.Event then
+                        print("FoundTipJar")
+                        robit(v.SmashCash.SmashCash.Event)
+                    end
+                end
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.UpperTorso:Destroy()
+            end)
+            madcitych1autofarm_Sec:NewButton("Auto Heist (Criminal)", "Do heists", function()
+                if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" or PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heros" then
+                    if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value then
+                        print("Jewl")
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" then
+                            while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Prisoners" do
+                                PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
+                                PROTECTED_RUNSERVICE.Heartbeat:Wait()
+                            end
+                        end
+                        while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" do
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0,100,0)
+                            PROTECTED_RUNSERVICE.Heartbeat:Wait()
+                        end
+                        coroutine.wrap(function()
+                            repeat
+                                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = PROTECTED_WORKSPACE.JewelryStore.JewelryVent.Vent.CFrame
+                                task.wait(.0001)
+                            until PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Robbing.Value or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value
+                        end)()
+                        for i,v in pairs(PROTECTED_WORKSPACE.JewelryStore.JewelryBoxes:GetChildren()) do
+                            if v.Name == "JewelBox" then
+                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                            end
+                        end
+                        repeat
+                            task.wait(.01)
+                        until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$5000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
+                        task.wait(.5)
+                        PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value = true
+                    end
+                    if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value then
+                        print("Bank")
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
+                        BypassTP(674, 85, 564)
+                        task.wait(.5)
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(681, 84, 585)
+                        repeat
+                            task.wait(0.1)
+                        until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$3000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
+                        task.wait(.5)
+                        PROTECTED_REPLICATEDSTORAGE.HeistStatus.Bank.Locked.Value = true
+                    end
+                    if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value then
+                        print("Casino")
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
+                        if PROTECTED_WORKSPACE.ObjectSelection.HackComputer:FindFirstChild("HackComputer") then
+                            BypassTP(1697, 38, 746)
+                            task.wait(.1)
+                            PROTECTED_WORKSPACE.ObjectSelection.HackComputer.HackComputer.HackComputer.Event:FireServer()
+                            task.wait(.01)
+                        end
+                        for i,v in pairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
+                            if v.Name == "Lever1" or v.Name == "Lever2" or v.Name == "Lever3" or v.Name == "Lever4" then
+                                if not v.Open.Value then
+                                    BypassTP(v.Lever.Position.x, v.Lever.Position.y, v.Lever.Position.z)
+                                    task.wait(.01)
+                                    v.Lever.Lever.Event:FireServer()
+                                    task.wait(.01)
+                                end
+                            end
+                        end
+                        BypassTP(1696, 41, 519)
+                        repeat
+                            task.wait(0.1)
+                        until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$4000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
+                        task.wait(.5)
+                        PROTECTED_REPLICATEDSTORAGE.HeistStatus.Casino.Locked.Value = true
+                    end
+                    if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value then
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
+                        Touchy(PROTECTED_WORKSPACE.Pyramid.Tele.Core1)
+                        task.wait(.5)
+                        BypassTP(1000, 51080, 540)
+                        repeat
+                            task.wait(0.1)
+                        until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$7500" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
+                        Touchy(PROTECTED_WORKSPACE.Pyramid.Tele.Core2)
+                        task.wait(1)
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 50, 0)
+                        PROTECTED_REPLICATEDSTORAGE.HeistStatus.Pyramid.Locked.Value = true
+                    end
+                    if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value then
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
+                        Touchy(PROTECTED_WORKSPACE.Club.TouchStart)
+                        BypassTP(1328, 145, -129)
+                        repeat
+                            task.wait(0.1)
+                        until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$6000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
+                        task.wait(.5)
+                        PROTECTED_REPLICATEDSTORAGE.HeistStatus.Club.Locked.Value = true
+                    end
+                end
+                BypassTP(2131, 26, 418)
+                task.wait(1)
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Health = 0
+            end)
+            madcitych1autofarm_Sec:NewButton("Auto Arrest (Police)", "Arrest Crimnal and Villans", function()
+                function CheckArrestable(Player, prisoners)
+                    if prisoners then
+                        if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" then
+                            return true
+                        else
+                            return false
+                        end
+                    else
+                        if Player.Team.Name == "Criminals" or Player.Team.Name == "Villains" then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+                end
+                --[[
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
+                repeat
+                    task.wait(1)
+                until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")]]
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Police")
+                repeat
+                    task.wait(1)
+                until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("LowerTorso")
+                if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("LowerTorso") then
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.LowerTorso:Destroy()
+                end
+                task.wait(0.5)
+                for _, v in pairs(PROTECTED_PLAYERSERVICE:GetPlayers()) do
+                    if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
+                    end
+                    if CheckArrestable(v) then
+                        for _ = 1, 200 do
+                            if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
+                                local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
+                                Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
+                            end
+                            if v.Team.Name == "Prisoners" then
+                                break
+                            end
+                            local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
+                            tpbypass.Transparency, tpbypass.CanCollide = 1, false
+                            tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                            task.wait()
+                            PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
+                            tpbypass.Transparency, tpbypass.CanCollide = 0, true
+                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
+                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Velocity = v.Character.HumanoidRootPart.Velocity
+                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", v)
+                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Arrest", v)
+                            task.wait()
+                        end
+                    end
+                end
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.UpperTorso:Destroy()
+            end)
+            madcitych1autofarm_Sec:NewButton("Xp Farm (Police, Laggy)", "Leave game to stop", function()
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
+                repeat
+                    task.wait(1)
+                until PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        
+                PROTECTED_PLAYERSERVICE.LocalPlayer.CharacterAdded:Connect(function()
+                    task.wait(1)
+                    if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect:Destroy()
+                    end
+                    local tpbypass = PROTECTED_WORKSPACE.Pyramid.Tele.Core2
+                    tpbypass.Transparency, tpbypass.CanCollide = 1, false
+                    tpbypass.CFrame = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                    task.wait()
+                    PROTECTED_WORKSPACE.Pyramid.Tele.Core2.CFrame = CFrame.new(1231.141845703125, 51051.234375, 381.09619140625)
+                    tpbypass.Transparency, tpbypass.CanCollide = 0, true
+                    for i = 1, 150 do
+                        PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1848, 75, -1314)
+                        task.wait()
+                    end
+                    local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
+                    Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
+                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
+                    PROTECTED_RUNSERVICE.RenderStepped:Connect(function()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/Mad%20City%3A%20Chapter%201%20Eject"))()
+                    end)
+                end)
+        
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Police")
+            end)
+            madcitych1autofarm_Sec:NewToggle("Xp Farm (Light)", "Leave game to stop", function(state)
+                if state then
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
+                            local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
+                            Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
+                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
+                        end
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Handcuffs") then
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                            end
+                        end
+                    end)
+                elseif getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT ~= nil then
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT:Disconnect()
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMLIGHT = nil
+                end
+            end)
+            madcitych1autofarm_Sec:NewToggle("Xp Farm (Super Light)", "This allows user to gain XP fast.", function(state)
+                if state then
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Handcuffs") then
+                            local Handcuff = PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack.Handcuffs.Handle
+                            Handcuff.Parent.Parent = PROTECTED_PLAYERSERVICE.LocalPlayer.Character
+                            PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Equip", PROTECTED_PLAYERSERVICE.LocalPlayer.Character, Handcuff)
+                        end
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Handcuffs") then
+                                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Eject", PROTECTED_PLAYERSERVICE.LocalPlayer)
+                            end
+                        end
+                    end)
+                elseif getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT ~= nil then
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT:Disconnect()
+                    getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT = nil
+                end
+            end, {getgenv().CONNECTFOLDER.MADCITYXPFARMSUPERLIGHT ~= nil, false})
+        
+        
+            madcitych1getitems_Sec:NewButton("Pickpocket (Keycard)", "Pickpocket a cop", function()
+                PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Pickpocket", PROTECTED_PLAYERSERVICE.LocalPlayer)
+            end)
+            madcitych1getitems_Sec:NewButton("Get Lazerblade", "To the mystery light", function()
+                local silverykey = PROTECTED_WORKSPACE.ObjectSelection.SilverKey
+                if silverykey:FindFirstChild("Nope") then
+                    silverykey.Nope.SilverKey.Event:FireServer()
+                else
+                    silverykey.SilverKey.SilverKey.Event:FireServer()
+                end
+                for _ = 1, 100 do
+                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:FindFirstChild("Lazerblade") then
+                        break
+                    end
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1738, 28, 2136)
+                    PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild("Lazerblade"):WaitForChild("Lazerblade"):WaitForChild("Lazerblade"):WaitForChild("Event"):FireServer()
+                    task.wait()
+                end
+            end)
+            madcitych1getitems_Sec:NewButton("Jetpack", "Get jetpack", function()
+                local bosskey = PROTECTED_WORKSPACE.ObjectSelection.BossKey
+                if bosskey:FindFirstChild("Nope") then
+                    bosskey.Nope.BossKey.Event:FireServer()
+                else
+                    bosskey.BossKey.BossKey.Event:FireServer()
+                end
+                for _ = 1, 100 do
+                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("Jetpack") then
+                        break
+                    end
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2183.76685, 32.7128277, -1554.86902)
+                    PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild("TakeJetpack"):WaitForChild("TakeJetpack"):WaitForChild("TakeJetpack"):WaitForChild("Event"):FireServer()
+                    task.wait()
+                end
+            end)
+            madcitych1getitems_Sec:NewDropdown("GetPower", "Shift to use power", {"Hotrod", "Frostbite", "Voltron", "Proton", "Vanta", "Archer"}, function(powerOption)
+                if powerOption == "Hotrod" then powerOption = "TheFlash"end
+                if powerOption == "Frostbite" then powerOption = "Chill" end
+                if powerOption == "Voltron" then powerOption = "Tesla" end
+                if powerOption == "Proton" then powerOption = "LaserPower" end
+                if powerOption == "Vanta" then powerOption = "Shadow" end
+                local powerValue = Instance.new("StringValue", PROTECTED_PLAYERSERVICE.LocalPlayer.Character)
+                powerValue.Name = "SuperPower"
+                powerValue.Value = powerOption
+            end)
+            madcitych1getitems_Sec:NewButton("Unlock all vehicles (Not in spawn menu, info for more", "This unlock only unlocks vehicle on map and also the UFO \n Unfortunately, you cant spawn them.", function()
+                for _, v in getgc(true) do
+                    if type(v) == "table" and rawget(v, 1) == "Camaro" then
+                        print('found')
+                        for _, vehicle in pairs(PROTECTED_REPLICATEDSTORAGE.ItemDatabase.Vehicles:GetChildren()) do
+                            table.insert(v, vehicle.Name)
+                        end
+                    end
+                end
+            end)
+            local vehiclelist = {}
+            for _, v in pairs(PROTECTED_WORKSPACE.ObjectSelection:GetChildren()) do
+                if v:FindFirstChild("DriveSeat") and string.find(v.Name, "'s Vehicle") == nil and table.find(vehiclelist, v.Name) == nil then
+                    print("Found Vehicle: ", v.Name)
+                    table.insert(vehiclelist, v.Name)
+                end
+            end
+            table.sort(vehiclelist)
+            local lastvehicleinput
+            madcitych1getitems_Sec:NewDropdown("Get Vehicle", "Free vehicle", vehiclelist, function(currentOption)
+                lastvehicleinput = currentOption
+                SpawnVehicle(currentOption)
+            end)
+            madcitych1getitems_Sec:NewTextBox("Vehicle", "Get vehicle by input", function(txt)
+                if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(txt) then
+                    if PROTECTED_WORKSPACE.ObjectSelection[txt]:FindFirstChild("DriveSeat") and string.find(PROTECTED_WORKSPACE.ObjectSelection[txt].Name, "'s Vehicle") == nil then
+                        lastvehicleinput = txt
+                        SpawnVehicle(txt)
+                    end
+                end
+            end)
+            madcitych1getitems_Sec:NewButton("Spawn Again", "Spawn vehicle without inputing again", function()
+                SpawnVehicle(lastvehicleinput)
+            end)
+            madcitych1getitems_Sec:NewButton("Escape Stuck in Vehicle", "Remove your vehicle", function()
+                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Sit = false
+                task.wait()
+                PROTECTED_WORKSPACE:WaitForChild("ObjectSelection"):WaitForChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):Destroy()
+            end)
+            PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.ChildRemoved:Connect(function(child)
+                if child:IsA("LocalScript") then
+                    for _,v in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:GetChildren()) do
+                        if v.Name == "ProBaconMissileMod" then
+                            v:Destroy()
+                        end
+                    end
+                end
+            end)
+        
+            madcitych1combat_Sec:NewButton("Missile Mod", "Mod missles", function()
+                for _,v in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui:GetChildren()) do
+                    if v:FindFirstChild("Car") and v.Name ~= "ProBaconMissileMod" then
+                        local vehiclescript = v:Clone()
+                        vehiclescript.Name = "ProBaconMissileMod"
+                        vehiclescript.Parent = v.Parent
+                    end
+                end
+            end)
+            madcitych1combat_Sec:NewButton("Mod Air", "Mod air vehicles", function()
+                for i,v in next, getgc(true) do
+                    if type(v) == "table" and rawget(v, "Missiles") then
+                        v.MissileCooldown = 0
+                        --v.MissileTargetRange = 2000
+                        v.MissileLock = 0.01
+                    end
+                end
+            end)
+            madcitych1combat_Sec:NewButton("Mod Ground Vehicles", "Mod cars", function()
+                for i,v in next, getgc(true) do
+                    if type(v) == "table" and rawget(v, "MaxSpeed") then
+                        rawset(v, "TurretFireRate", 0.3)
+                        rawset(v, "MaxSpeed", 500)
+                        rawset(v, "HoverHitWater", true)
+                        rawset(v, "CanTurnHoverMode", true)
+                        rawset(v, "StartTime", 0)
+                    end
+                end
+            end)
+            madcitych1combat_Sec:NewButton("Mod Weapons", "Mod Weapons", function()
+                for _,q in pairs(PROTECTED_PLAYERSERVICE.LocalPlayer.Backpack:GetChildren()) do
+                    if q.Name~= "Phone" and q:IsA("Tool") and q:FindFirstChildWhichIsA("LocalScript") then
+                        local dupecount = 0
+                        for _, v in pairs(q:GetChildren()) do
+                            if v:IsA("LocalScript") then
+                                dupecount = dupecount + 1
+                            end
+                        end
+                        print(dupecount)
+                        if dupecount == 1 then
+                            for _ = 1, 9 do
+                                local dupe = q:FindFirstChildWhichIsA("LocalScript"):Clone()
+                                dupe.Parent = q
                             end
                         end
                     end
                 end
-            end
-        end, {getgenv().MadLoopKillEnemy, false})
-        madcitych1combat_Sec:NewButton("Kill All Enemy", "Terminated All Enemy!", function()
-            if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard") then
-                local lastpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-                local buzzardweusehere = PROTECTED_WORKSPACE.ObjectSelection.Buzzard
-                local returnplace = buzzardweusehere.PrimaryPart.CFrame*CFrame.new(0 , 5, 20)
-                buzzardweusehere:SetPrimaryPartCFrame(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 5, 5))
-                task.wait()
-                buzzardweusehere.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
-                task.wait()
+            end)
+            madcitych1combat_Sec:NewToggle("Kill Aura", "Kill enemy nearby", function(state)
+                if state then
+                    getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
+                        for _, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
+                            if v.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                                if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (v.Character.HumanoidRootPart.Position-PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 7 and isEnemyTeam(v) and v.Character.Humanoid.Health > 0 then
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                    PROTECTED_REPLICATEDSTORAGE.Event:FireServer("Punch", v.Character:FindFirstChild("Humanoid"))
+                                end
+                            end
+                        end
+                    end)
+                elseif getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA ~= nil then
+                    getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA:Disconnect()
+                    getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA = nil
+                end
+            end, {getgenv().CONNECTFOLDER.MADCITYCH1KILLAURA ~= nil, false})
+            madcitych1combat_Sec:NewToggle("Loop Kill Enemy (On Vehicle)", "You must be on a vehice with missiles", function(state)
+                getgenv().MadLoopKillEnemy = state
                 function isEnemyTeam(player)
                     if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" and PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heroes" then
                         if player.Team.Name == "Police" or player.Team.Name == "Heroes" then
@@ -4125,17 +4097,11 @@ if success then
                     end
                     return false
                 end
-                local tasks = 0
-                for i, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
-                    if v.Character then
-                        if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and isEnemyTeam(v) and v.Character.Humanoid.Health > 0 then
-                            print("Ttarget Found: ", v.Name)
-                            coroutine.wrap(function()
-                                tasks = tasks + 1
-                                for _ = 1, 100 do
-                                    if not v or not v.Character or not v.Character:FindFirstChild("Humanoid") or not (v.Character.Humanoid.Health > 0) or isEnemyTeam(v) == false then
-                                        break
-                                    end
+                while getgenv().MadLoopKillEnemy and task.wait(.01) do
+                    for _, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
+                        if v.Character then
+                            if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChildOfClass("Humanoid") and isEnemyTeam(v) then
+                                if v.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
                                     local args = {
                                         [1] = "BM",
                                         [2] = Vector3.new(v.Character.HumanoidRootPart.Position.x, v.Character.HumanoidRootPart.Position.y, v.Character.HumanoidRootPart.Position.z)
@@ -4143,221 +4109,300 @@ if success then
                                     PROTECTED_REPLICATEDSTORAGE:WaitForChild("Event"):FireServer(unpack(args))
                                     task.wait()
                                 end
-                                tasks = tasks - 1
-                            end)()
-                        end
-                    end
-                end
-                task.wait(.25)
-                repeat
-                    task.wait()
-                    PROTECTED_WORKSPACE.ObjectSelection:WaitForChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle").DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
-                until tasks == 0 or not PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Sit = false
-                task.wait(.05)
-                PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):SetPrimaryPartCFrame(returnplace)
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = lastpos
-                task.wait(5)
-                if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") then
-                    if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle").Name == PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle" then
-                        PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):Destroy()
-                    end
-                end
-            else
-                Window:NotificationBar("Pro Bacon", "Vehicle not found. Please wait until it respawns. We will notify you when it does.", 5)
-                repeat
-                    task.wait(0.01)
-                until PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard")
-                Window:NotificationBar("Pro Bacon", 'Vehicle respawned. You can now use "Kill All Enemy".', 2)
-            end
-        end)
-        madcitych1combat_Sec:NewButton("No Camera Shake", "No shaking by explosives", function()
-            local CameraShaker = require(PROTECTED_REPLICATEDSTORAGE.Modules.CameraShaker)
-            CameraShaker.StartShake = function() return nil end
-            CameraShaker.ShakeOnce = function() return nil end
-            CameraShaker.ShakeSustain = function() return nil end
-            CameraShaker.CameraShakeInstance = function() return nil end
-            CameraShaker.Shake = function() return nil end
-            CameraShaker.Start = function() return nil end
-        end)
-        madcitych1bypassmethod_Sec:NewDropdown("Bypass Method", "Teleport bypassing method", {"Instant", "Tween"}, function(method)
-            getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = method
-        end)
-        madcitych1teleport_Sec:NewButton("Escape Prison (Go to Car)", "Go to base using vehicle", function()
-            ProBaconFunction:VelocityTeleport(-885, 60, -2652.24854, 1500)
-            task.wait(.5)
-            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-            task.wait(.05)
-            PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.E, true, game)
-        end)
-        madcitych1teleport_Sec:NewButton("[Gun Shop]", "Go to gun shop", function()
-            BypassTP(-1647, 43, 684)
-        end)
-        madcitych1teleport_Sec:NewButton("Prison Cell", "Go to prison cell", function()
-            BypassTP(-814, 53, -3260)
-        end)
-        madcitych1teleport_Sec:NewButton("Prison Yard", "Go to prison yard", function()
-            BypassTP(-1055, 53, -3085)
-        end)
-        madcitych1teleport_Sec:NewButton("Prison Out", "Go to outside of prison", function()
-            BypassTP(-890, 54, -2669)
-        end)
-        madcitych1teleport_Sec:NewButton("Police Station", "Go to police station", function()
-            BypassTP(-972, 53, -2952)
-        end)
-        madcitych1teleport_Sec:NewButton("[Chiminal Base]", "Go to criminal base", function()
-            BypassTP(2131, 26, 418)
-        end)
-        madcitych1teleport_Sec:NewButton("Casino", "Go to casino", function()
-            BypassTP(-1647, 43, 684)
-        end)
-        madcitych1teleport_Sec:NewButton("Bank", "Go to bank", function()
-            BypassTP(753, 25, 489)
-        end)
-        madcitych1teleport_Sec:NewButton("Jewelry Store", "Go to jewelry store", function()
-            BypassTP(-76, 87, 820)
-        end)
-        madcitych1teleport_Sec:NewButton("Club", "Go to club", function()
-            BypassTP(1310, 18, -20)
-        end)
-        madcitych1teleport_Sec:NewButton("Pyramid", "Go to pyramid", function()
-            BypassTP(-1047, 18, -505)
-        end)
-        madcitych1teleport_Sec:NewButton("[Airport]", "Go to airport", function()
-            BypassTP(-2140, 28, -1406)
-        end)
-        madcitych1teleport_Sec:NewButton("Air Vehicles", "Go to where you can purchase air vehicles", function()
-            BypassTP(-2409, 25, -1470)
-        end)
-        getgenv().VARIABLEFOLDER.TELEPORT_FUN = function()
-            if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "PLAYER" then
-                if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR then
-                    if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                        if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                            local cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
-                            BypassTP(cf.X, cf.Y, cf.Z)
-                            if getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD ~= "Instant" then
-                                cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
-                                BypassTP(cf.X, cf.Y, cf.Z)
-                                cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
-                                BypassTP(cf.X, cf.Y, cf.Z)
-                                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
                             end
                         end
                     end
                 end
-            end
-            if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "POSITION" then
-                local TARGETLOCATION = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR
-                if TARGETLOCATION then
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                            BypassTP(TARGETLOCATION.X, TARGETLOCATION.Y, TARGETLOCATION.Z)
+            end, {getgenv().MadLoopKillEnemy, false})
+            madcitych1combat_Sec:NewButton("Kill All Enemy", "Terminated All Enemy!", function()
+                if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard") then
+                    local lastpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
+                    local buzzardweusehere = PROTECTED_WORKSPACE.ObjectSelection.Buzzard
+                    local returnplace = buzzardweusehere.PrimaryPart.CFrame*CFrame.new(0 , 5, 20)
+                    buzzardweusehere:SetPrimaryPartCFrame(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0, 5, 5))
+                    task.wait()
+                    buzzardweusehere.DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
+                    task.wait()
+                    function isEnemyTeam(player)
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Police" and PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Heroes" then
+                            if player.Team.Name == "Police" or player.Team.Name == "Heroes" then
+                                return true
+                            end
                         else
-                            Window:NotificationBar("Pro Bacon", "Player has no primary part!", 2)
+                            if player.Team.Name ~= "Police" and player.Team.Name ~= "Heroes" then
+                                return true
+                            end
                         end
-                    else
-                        Window:NotificationBar("Pro Bacon", "Character not found!", 2)
+                        return false
+                    end
+                    local tasks = 0
+                    for i, v in pairs(PROTECTED_PLAYERSERVICE:GetChildren()) do
+                        if v.Character then
+                            if v.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and isEnemyTeam(v) and v.Character.Humanoid.Health > 0 then
+                                print("Ttarget Found: ", v.Name)
+                                coroutine.wrap(function()
+                                    tasks = tasks + 1
+                                    for _ = 1, 100 do
+                                        if not v or not v.Character or not v.Character:FindFirstChild("Humanoid") or not (v.Character.Humanoid.Health > 0) or isEnemyTeam(v) == false then
+                                            break
+                                        end
+                                        local args = {
+                                            [1] = "BM",
+                                            [2] = Vector3.new(v.Character.HumanoidRootPart.Position.x, v.Character.HumanoidRootPart.Position.y, v.Character.HumanoidRootPart.Position.z)
+                                        }
+                                        PROTECTED_REPLICATEDSTORAGE:WaitForChild("Event"):FireServer(unpack(args))
+                                        task.wait()
+                                    end
+                                    tasks = tasks - 1
+                                end)()
+                            end
+                        end
+                    end
+                    task.wait(.25)
+                    repeat
+                        task.wait()
+                        PROTECTED_WORKSPACE.ObjectSelection:WaitForChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle").DriveSeat:Sit(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid)
+                    until tasks == 0 or not PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.Humanoid.Sit = false
+                    task.wait(.05)
+                    PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):SetPrimaryPartCFrame(returnplace)
+                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = lastpos
+                    task.wait(5)
+                    if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle") then
+                        if PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle").Name == PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle" then
+                            PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild(PROTECTED_PLAYERSERVICE.LocalPlayer.Name.."'s Vehicle"):Destroy()
+                        end
                     end
                 else
-                    Window:NotificationBar("Pro Bacon", "Invalid input!", 2)
+                    Window:NotificationBar("Pro Bacon", "Vehicle not found. Please wait until it respawns. We will notify you when it does.", 5)
+                    repeat
+                        task.wait(0.01)
+                    until PROTECTED_WORKSPACE.ObjectSelection:FindFirstChild("Buzzard")
+                    Window:NotificationBar("Pro Bacon", 'Vehicle respawned. You can now use "Kill All Enemy".', 2)
                 end
-            end
-            if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "CFRAME" then
-                local TARGETLOCATION = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR
-                if TARGETLOCATION then
-                    if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                            BypassTP(TARGETLOCATION.X, TARGETLOCATION.Y, TARGETLOCATION.Z)
-                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = TARGETLOCATION
+            end)
+            madcitych1combat_Sec:NewButton("No Camera Shake", "No shaking by explosives", function()
+                local CameraShaker = require(PROTECTED_REPLICATEDSTORAGE.Modules.CameraShaker)
+                CameraShaker.StartShake = function() return nil end
+                CameraShaker.ShakeOnce = function() return nil end
+                CameraShaker.ShakeSustain = function() return nil end
+                CameraShaker.CameraShakeInstance = function() return nil end
+                CameraShaker.Shake = function() return nil end
+                CameraShaker.Start = function() return nil end
+            end)
+            madcitych1bypassmethod_Sec:NewDropdown("Bypass Method", "Teleport bypassing method", {"Instant", "Tween"}, function(method)
+                getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = method
+            end)
+            madcitych1teleport_Sec:NewButton("Escape Prison (Go to Car)", "Go to base using vehicle", function()
+                ProBaconFunction:VelocityTeleport(-885, 60, -2652.24854, 1500)
+                task.wait(.5)
+                PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                task.wait(.05)
+                PROTECTED_VIRTUALINPUTMANAGER:SendKeyEvent(true, Enum.KeyCode.E, true, game)
+            end)
+            madcitych1teleport_Sec:NewButton("[Gun Shop]", "Go to gun shop", function()
+                BypassTP(-1647, 43, 684)
+            end)
+            madcitych1teleport_Sec:NewButton("Prison Cell", "Go to prison cell", function()
+                BypassTP(-814, 53, -3260)
+            end)
+            madcitych1teleport_Sec:NewButton("Prison Yard", "Go to prison yard", function()
+                BypassTP(-1055, 53, -3085)
+            end)
+            madcitych1teleport_Sec:NewButton("Prison Out", "Go to outside of prison", function()
+                BypassTP(-890, 54, -2669)
+            end)
+            madcitych1teleport_Sec:NewButton("Police Station", "Go to police station", function()
+                BypassTP(-972, 53, -2952)
+            end)
+            madcitych1teleport_Sec:NewButton("[Chiminal Base]", "Go to criminal base", function()
+                BypassTP(2131, 26, 418)
+            end)
+            madcitych1teleport_Sec:NewButton("Casino", "Go to casino", function()
+                BypassTP(-1647, 43, 684)
+            end)
+            madcitych1teleport_Sec:NewButton("Bank", "Go to bank", function()
+                BypassTP(753, 25, 489)
+            end)
+            madcitych1teleport_Sec:NewButton("Jewelry Store", "Go to jewelry store", function()
+                BypassTP(-76, 87, 820)
+            end)
+            madcitych1teleport_Sec:NewButton("Club", "Go to club", function()
+                BypassTP(1310, 18, -20)
+            end)
+            madcitych1teleport_Sec:NewButton("Pyramid", "Go to pyramid", function()
+                BypassTP(-1047, 18, -505)
+            end)
+            madcitych1teleport_Sec:NewButton("[Airport]", "Go to airport", function()
+                BypassTP(-2140, 28, -1406)
+            end)
+            madcitych1teleport_Sec:NewButton("Air Vehicles", "Go to where you can purchase air vehicles", function()
+                BypassTP(-2409, 25, -1470)
+            end)
+            getgenv().VARIABLEFOLDER.TELEPORT_FUN = function()
+                if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "PLAYER" then
+                    if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR then
+                        if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character and PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                            if getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character:FindFirstChild("HumanoidRootPart") and PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                local cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
+                                BypassTP(cf.X, cf.Y, cf.Z)
+                                if getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD ~= "Instant" then
+                                    cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
+                                    BypassTP(cf.X, cf.Y, cf.Z)
+                                    cf = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
+                                    BypassTP(cf.X, cf.Y, cf.Z)
+                                    PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR.Character.HumanoidRootPart.CFrame
+                                end
+                            end
+                        end
+                    end
+                end
+                if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "POSITION" then
+                    local TARGETLOCATION = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR
+                    if TARGETLOCATION then
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                BypassTP(TARGETLOCATION.X, TARGETLOCATION.Y, TARGETLOCATION.Z)
+                            else
+                                Window:NotificationBar("Pro Bacon", "Player has no primary part!", 2)
+                            end
                         else
-                            Window:NotificationBar("Pro Bacon", "Player has no primary part!", 2)
+                            Window:NotificationBar("Pro Bacon", "Character not found!", 2)
                         end
                     else
-                        Window:NotificationBar("Pro Bacon", "Character not found!", 2)
+                        Window:NotificationBar("Pro Bacon", "Invalid input!", 2)
                     end
-                else
-                    Window:NotificationBar("Pro Bacon", "Invalid input!", 2)
+                end
+                if getgenv().VARIABLEFOLDER.LASTTELEPORTINPUT == "CFRAME" then
+                    local TARGETLOCATION = getgenv().VARIABLEFOLDER.LASTTELEPORTVAR
+                    if TARGETLOCATION then
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Character then
+                            if PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                BypassTP(TARGETLOCATION.X, TARGETLOCATION.Y, TARGETLOCATION.Z)
+                                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = TARGETLOCATION
+                            else
+                                Window:NotificationBar("Pro Bacon", "Player has no primary part!", 2)
+                            end
+                        else
+                            Window:NotificationBar("Pro Bacon", "Character not found!", 2)
+                        end
+                    else
+                        Window:NotificationBar("Pro Bacon", "Invalid input!", 2)
+                    end
                 end
             end
+            Window:NotificationBar("Pro Bacon", "Teleport Tab has been overwritten.", 2)
         end
-        Window:NotificationBar("Pro Bacon", "Teleport Tab has been overwritten.", 2)
+        if game.PlaceVersion == 84 then
+            LOAD_MADCITY_CH1()
+        else
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/OptionChooser"))().OptionChooser({
+                Title = "Game Update Detection",
+                Content = "A game update has been detected, potentially resulting in script patching or detection.  Do you wish to proceed with loading the Mad City: Chapter 1 tabs?",
+                Button1 = "No.",
+                Button2 = "Proceed.",
+                Callback2 = LOAD_MADCITY_CH1
+            })
+        end
     elseif game.PlaceId == 1224212277 then -- Mad City Chapter: 2
         task.wait(2)
-        local MADCITYCHAPTER2FUNCTIONPACK = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
-        local madcitych2_Tab = Window:NewTab("Mad City CH2")
-        local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
-        local madcitych2farm_Tab = Window:NewTab("Auto Farm")
-        local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
-        getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
-        getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
-        madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
-            MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
-        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
-        madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
-            MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
-        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
-        madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
-            MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
-        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
-        madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
-            getgenv().ProBaconHubMadCitySilentAimEnabled = state
-        end)
-        madcitych2_Sec:NewDropdown("Aim Parts", "Choose a body part to aim at.", {"Head", "HumanoidRootPart", "UpperTorso"}, function(opt)
-            getgenv().ProBaconHubMadCitySilentAimTargetPart = opt
-        end)
-        madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
-            MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
-        end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
-        madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
-            MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
-        end)
-        madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
-
-        madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
-            getgenv().Key = txt
-        end)
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP or true
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST or true
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK or false
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB or false
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT or false
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID or false
-        getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE or false
-        madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Server Hop", getgenv().ServerHop}, {"Mini Heist", getgenv().MiniHeist}, {"Bank", getgenv().Bank}, {"Club", getgenv().Club}, {"Resort", getgenv().Resort}, {"Pyramid", getgenv().Pyramid}, {"Speed Mode", getgenv().SpeedMode}}, function(opt)
-            for _,v in pairs(opt) do
-                if v[1] == "Server Hop" then
-                    getgenv().ServerHop = v[2]
-                end
-                if v[1] == "Mini Heist" then
-                    getgenv().MiniHeist = v[2]
-                end
-                if v[1] == "Bank" then
-                    getgenv().Bank = v[2]
-                end
-                if v[1] == "Club" then
-                    getgenv().Club = v[2]
-                end
-                if v[1] == "Resort" then
-                    getgenv().Resort = v[2]
-                end
-                if v[1] == "Pyramid" then
-                    getgenv().Pyramid = v[2]
-                end
-                if v[1] == "Speed Mode" then
-                    getgenv().SpeedMode = v[2]
-                end
+        local function LOAD_MADCITY_CH2()
+            local MADCITYCHAPTER2FUNCTIONPACK = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
+            local madcitych2_Tab = Window:NewTab("Mad City CH2")
+            local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
+            local madcitych2farm_Tab = Window:NewTab("Auto Farm")
+            local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
+            getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
+            getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
+            madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
+                MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
+            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
+            madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
+                MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
+            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
+            madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
+                MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
+            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
+            madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
+                getgenv().ProBaconHubMadCitySilentAimEnabled = state
+            end)
+            madcitych2_Sec:NewDropdown("Aim Parts", "Choose a body part to aim at.", {"Head", "HumanoidRootPart", "UpperTorso"}, function(opt)
+                getgenv().ProBaconHubMadCitySilentAimTargetPart = opt
+            end)
+            madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
+                MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
+            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
+            madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
+                MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
+            end)
+            madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
+                
+            if ProBaconUncCheck.CHECK_UNC()["check_require"] == false or ProBaconUncCheck.CHECK_UNC()["check_getgc"] == false then
+                madcitych2_Sec:NewErrorLabel("\"require()\" or/and \"getgc()\" is/are not available with current environment. Most features will be disabled.")
             end
-        end)
-        madcitych2farm_Sec:NewButton("Auto Rob V3", "This button allows user to rob heist base on the settings above.", function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoRobV3"))()
-        end)
-        madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
-        end)
-        madcitych2farm_Sec:NewWarningLabel("Most features does not work with Xeno.")
-        madcitych2farm_Sec:NewErrorLabel("We disclaim all liability for account suspensions.")
+    
+            madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
+                getgenv().Key = txt
+            end)
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP or true
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST or true
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK or false
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB or false
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT or false
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID or false
+            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE or false
+            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Server Hop", getgenv().ServerHop}, {"Mini Heist", getgenv().MiniHeist}, {"Bank", getgenv().Bank}, {"Club", getgenv().Club}, {"Resort", getgenv().Resort}, {"Pyramid", getgenv().Pyramid}, {"Speed Mode", getgenv().SpeedMode}}, function(opt)
+                for _,v in pairs(opt) do
+                    if v[1] == "Server Hop" then
+                        getgenv().ServerHop = v[2]
+                    end
+                    if v[1] == "Mini Heist" then
+                        getgenv().MiniHeist = v[2]
+                    end
+                    if v[1] == "Bank" then
+                        getgenv().Bank = v[2]
+                    end
+                    if v[1] == "Club" then
+                        getgenv().Club = v[2]
+                    end
+                    if v[1] == "Resort" then
+                        getgenv().Resort = v[2]
+                    end
+                    if v[1] == "Pyramid" then
+                        getgenv().Pyramid = v[2]
+                    end
+                    if v[1] == "Speed Mode" then
+                        getgenv().SpeedMode = v[2]
+                    end
+                end
+            end)
+            madcitych2farm_Sec:NewButton("Auto Rob V3", "This button allows user to rob heist base on the settings above.", function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoRobV3"))()
+            end)
+            madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
+            end)
+            local MADCITYERRORLABEL = ""
+            if ProBaconUncCheck.CHECK_UNC()["check_require"] == false then
+                MADCITYERRORLABEL = MADCITYERRORLABEL .. "UNC function \"require()\" is not available with current environment. Auto Rob V3 will not work.\n"
+            end
+            if ProBaconUncCheck.CHECK_UNC()["check_getgc"] == false then
+                MADCITYERRORLABEL = MADCITYERRORLABEL .. "UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n"
+            end
+            madcitych2farm_Sec:NewErrorLabel(MADCITYERRORLABEL .. "We disclaim all liability for account suspensions.")
+        end
+        if game.PlaceVersion == 11553 then
+            LOAD_MADCITY_CH2()
+        else
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/OptionChooser"))().OptionChooser({
+                Title = "Game Update Detection",
+                Content = "A game update has been detected, potentially resulting in script patching or detection.  Do you wish to proceed with loading the Mad City: Chapter 2 tabs?",
+                Button1 = "No.",
+                Button2 = "Proceed.",
+                Callback2 = LOAD_MADCITY_CH2
+            })
+        end
     elseif game.PlaceId == 21532277 then -- Notoriety Lobby
         local notorietylobby_Tab = Window:NewTab("Notoriety")
         local notorietylobby_Sec = notorietylobby_Tab:NewSection("Lobby")
