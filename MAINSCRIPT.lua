@@ -57,9 +57,12 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.6"
-local PBH_LASTUPDATE = "28/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.7"
+local PBH_LASTUPDATE = "29/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.7 (28/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Fixed</font> Auto Heist in "Mad City: Chater 1"
+
 <b>[REWRITE: 2.1.6 (28/3/25)]:</b>
 Optimized script.
 <font color="rgb(0, 225, 0)">Added</font> simple UNC check for common required UNC functions.
@@ -3673,13 +3676,13 @@ if success then
                     if not PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value then
                         print("Jewl")
                         PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
-                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" then
+                        if PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminals" then
                             while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Prisoners" do
                                 PROTECTED_REPLICATEDSTORAGE:WaitForChild("RemoteFunction"):InvokeServer("SetTeam", "Prisoners")
                                 PROTECTED_RUNSERVICE.Heartbeat:Wait()
                             end
                         end
-                        while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminal" do
+                        while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminals" do
                             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0,100,0)
                             PROTECTED_RUNSERVICE.Heartbeat:Wait()
                         end
@@ -3689,14 +3692,15 @@ if success then
                                 task.wait(.0001)
                             until PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Robbing.Value or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value
                         end)()
-                        for i,v in pairs(PROTECTED_WORKSPACE.JewelryStore.JewelryBoxes:GetChildren()) do
-                            if v.Name == "JewelBox" then
-                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                                PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
-                            end
-                        end
                         repeat
+                            for _,v in pairs(PROTECTED_WORKSPACE.JewelryStore.JewelryBoxes:GetChildren()) do
+                                if v.Name == "JewelBox" then
+                                    PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                                    PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                                    PROTECTED_WORKSPACE:WaitForChild("JewelryStore"):WaitForChild("JewelryBoxes"):WaitForChild("JewelryManager"):WaitForChild("Event"):FireServer(v)
+                                    task.wait(0.001)
+                                end
+                            end
                             task.wait(.01)
                         until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text == "$5000" or PROTECTED_REPLICATEDSTORAGE.HeistStatus.Jewel.Locked.Value or not PROTECTED_PLAYERSERVICE.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                         Touchy(PROTECTED_WORKSPACE.CriminalBase1.TouchEnd)
