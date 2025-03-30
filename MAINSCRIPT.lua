@@ -15,6 +15,11 @@ local PROTECTED_VIRTUALINPUTMANAGER = cloneref(game:GetService("VirtualInputMana
 local PROTECTED_STARTERGUI = cloneref(game:GetService("StarterGui"))
 local PROTECTED_HTTPSERVICE = cloneref(game:GetService("HttpService"))
 local setclipboard = setclipboard or print
+
+local UNPACKKEY = getgenv().LINKTOUNPACKKEY
+getgenv().LINKTOUNPACKKEY = nil
+
+
 if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     getgenv().PROBACONHUBLOADID = 0
 else
@@ -172,9 +177,6 @@ Added get loaderscript.
 <b>[REWRITE: 2.0.0]:</b>
 New release of the rewritten ProBaconHub.
 ]]
-
-local UNPACKKEY = getgenv().LINKTOUNPACKKEY
-getgenv().LINKTOUNPACKKEY = nil
 
 local Library, Window, ProBaconFunction, ProBaconUncCheck
 
