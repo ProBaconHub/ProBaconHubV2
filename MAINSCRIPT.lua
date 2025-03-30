@@ -57,9 +57,12 @@ local SUPPORTEDGAMES = {
     "Wordle", -- 17262338236                        v
     "Zombie Attack (Beta)" -- 1240123653 1632210982 v
 }
-local PBH_VERSION = "REWRITE: 2.1.7"
-local PBH_LASTUPDATE = "29/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.8"
+local PBH_LASTUPDATE = "30/3/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.8 (30/3/25)]:</b>
+<font color="rgb(0, 225, 0)">Fixed</font> Auto Interaction in "Mad City: Chater 1"
+
 <b>[REWRITE: 2.1.7 (28/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Fixed</font> Auto Heist in "Mad City: Chater 1"
 
@@ -3604,7 +3607,7 @@ if success then
             checkbypassmethodprogressbar:AddProgress(1)
             checkbypassmethod_Tab:Destroy()
         
-            local madcitych1autofarm_Tab = Window:NewTab("Anto Farm")
+            local madcitych1autofarm_Tab = Window:NewTab("Auto Farm")
             local madcitych1items_Tab = Window:NewTab("Items")
             local madcitych1combat_Tab = Window:NewTab("Mad City Combat")
             local madcitych1teleport_Tab = Window:NewTab("Mad Teleport")
@@ -4318,7 +4321,9 @@ if success then
             local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
             getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
             getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
+            end)
             madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
                 MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
             end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
@@ -4342,9 +4347,7 @@ if success then
             end)
             madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
                 
-            if ProBaconUncCheck.CHECK_UNC()["check_require"] == false or ProBaconUncCheck.CHECK_UNC()["check_getgc"] == false then
-                madcitych2_Sec:NewErrorLabel("\"require()\" or/and \"getgc()\" is/are not available with current environment. Most features will be disabled.")
-            end
+            madcitych2_Sec:NewErrorLabel("If \"require()\" or \"getgc()\" are not available with current environment. Most features will be disabled.")
     
             madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
                 getgenv().Key = txt
@@ -4387,14 +4390,7 @@ if success then
             madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
             end)
-            local MADCITYERRORLABEL = ""
-            if ProBaconUncCheck.CHECK_UNC()["check_require"] == false then
-                MADCITYERRORLABEL = MADCITYERRORLABEL .. "UNC function \"require()\" is not available with current environment. Auto Rob V3 will not work.\n"
-            end
-            if ProBaconUncCheck.CHECK_UNC()["check_getgc"] == false then
-                MADCITYERRORLABEL = MADCITYERRORLABEL .. "UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n"
-            end
-            madcitych2farm_Sec:NewErrorLabel(MADCITYERRORLABEL .. "We disclaim all liability for account suspensions.")
+            madcitych2farm_Sec:NewErrorLabel("If UNC function \"require()\" is not available with current environment. Auto Rob V3 will not work.\nIf UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n\nWe disclaim all liability for account suspensions.")
         end
         if game.PlaceVersion == 11553 then
             LOAD_MADCITY_CH2()
