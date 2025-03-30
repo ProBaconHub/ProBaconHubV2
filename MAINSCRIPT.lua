@@ -61,7 +61,9 @@ local PBH_VERSION = "REWRITE: 2.1.8"
 local PBH_LASTUPDATE = "30/3/2025 (UTC)"
 local UPDATELOG = [[
 <b>[REWRITE: 2.1.8 (30/3/25)]:</b>
-<font color="rgb(0, 225, 0)">Fixed</font> Auto Interaction in "Mad City: Chater 1"
+<font color="rgb(0, 225, 0)">Fixed</font> Auto Interaction in "Mad City: Chater 2"
+<font color="rgb(0, 225, 0)">Added</font> Added door mods in "Mad City: Chater 2"
+<font color="rgb(0, 225, 0)">Improved</font> Silent Aim in "Mad City: Chater 2"
 
 <b>[REWRITE: 2.1.7 (28/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Fixed</font> Auto Heist in "Mad City: Chater 1"
@@ -4344,6 +4346,20 @@ if success then
             end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
             madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
                 MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
+            end)
+            madcitych2_Sec:NewToggle("Open Doors", "This allows user to open all doors at once", function(state)
+                for _,v in pairs(game.Workspace:GetDescendants()) do
+                    if v:GetAttribute("_isOpen") ~= nil then
+                        v:SetAttribute("_isOpen", state)
+                    end
+                end
+            end)
+            madcitych2_Sec:NewButton("Quick Doors", "This force doors to open quickly.", function()
+                for _,v in pairs(game.Workspace:GetDescendants()) do
+                    if v:GetAttribute("AnimSpeed") ~= nil then
+                        v:SetAttribute("AnimSpeed", 50)
+                    end
+                end
             end)
             madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
                 
