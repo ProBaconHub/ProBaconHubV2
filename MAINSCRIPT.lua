@@ -1923,7 +1923,7 @@ if success then
                 end
                 repeat
                     task.wait(0.1)
-                until game:GetService("Players").LocalPlayer["Player Data"].GameData.Energy.Value == 100
+                until PROTECTED_PLAYERSERVICE.LocalPlayer["Player Data"].GameData.Energy.Value == 100
                 getgenv().CONNECTFOLDER.BLOXHUNTZAPFARM = PROTECTED_RUNSERVICE.Heartbeat:Connect(function()
                     PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,-10,0)
                 end)
@@ -4328,9 +4328,6 @@ if success then
             pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
             end)
-            madcitych2_Sec:NewToggle("Auto Interaction", "This could help user to spam interactions.", function(state)
-                MADCITYCHAPTER2FUNCTIONPACK.AutoInteract(state)
-            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["AutoInteract"], false})
             madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
                 MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
             end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
@@ -4350,14 +4347,14 @@ if success then
                 MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
             end)
             madcitych2_Sec:NewButton("Open Doors", "This allows user to open all doors at once", function()
-                for _,v in pairs(game.Workspace:GetDescendants()) do
+                for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
                     if v:GetAttribute("_isOpen") ~= nil then
                         v:SetAttribute("_isOpen", true)
                     end
                 end
             end)
             madcitych2_Sec:NewButton("Quick Doors", "This force doors to open quickly.", function()
-                for _,v in pairs(game.Workspace:GetDescendants()) do
+                for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
                     if v:GetAttribute("AnimSpeed") ~= nil then
                         v:SetAttribute("AnimSpeed", 50)
                     end
@@ -4857,8 +4854,8 @@ if success then
             end
         end)
         sonicspeedsimulatorcollect_Sec:NewButton("Collect world currencies", "This button allows user to gain world currencies from the rendered map distance.", function()
-            for _,v in pairs(workspace["World Currencies"]:GetChildren()) do
-                game:GetService("ReplicatedStorage"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("WorldCurrencyService"):WaitForChild("RE"):WaitForChild("PickupWorldCurrency"):FireServer(v.Name)
+            for _,v in pairs(PROTECTED_WORKSPACE["World Currencies"]:GetChildren()) do
+                PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("WorldCurrencyService"):WaitForChild("RE"):WaitForChild("PickupWorldCurrency"):FireServer(v.Name)
             end
         end)
     
@@ -4875,8 +4872,8 @@ if success then
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("HoverboardBoostAmount", 10000, {["ZoneName"] = PROTECTED_PLAYERSERVICE.LocalPlayer:GetAttribute("ZoneName")})
         end)
         sonicspeedsimulatorquest_Sec:NewButton("Hover board trick quest", "This button allows user to complete hover board trick quest.", function()
-            game:GetService("ReplicatedStorage"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("HoverboardTrickAmount",10000,{["ZoneName"] = "VerifyOnServer"})
-            game:GetService("ReplicatedStorage"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("SpecificHoverboardTrickAmount",10000,{["Hoverboard"] = "VerifyOnServer"})
+            PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("HoverboardTrickAmount",10000,{["ZoneName"] = "VerifyOnServer"})
+            PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("SpecificHoverboardTrickAmount",10000,{["Hoverboard"] = "VerifyOnServer"})
         end)
         sonicspeedsimulatorquest_Sec:NewButton("Complete RailGrindPoints quest", "This button allows user to gain rail-graind points to complete railgrindpoints quest.", function()
             PROTECTED_REPLICATEDSTORAGE:WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ProgressService"):WaitForChild("RE"):WaitForChild("ClientLogProgress"):FireServer("RailGrindPoints",  math.huge, {["ZoneName"] = PROTECTED_PLAYERSERVICE.LocalPlayer:GetAttribute("ZoneName")})
