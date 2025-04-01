@@ -4349,10 +4349,10 @@ if success then
             madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
                 MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
             end)
-            madcitych2_Sec:NewToggle("Open Doors", "This allows user to open all doors at once", function(state)
+            madcitych2_Sec:NewButton("Open Doors", "This allows user to open all doors at once", function()
                 for _,v in pairs(game.Workspace:GetDescendants()) do
                     if v:GetAttribute("_isOpen") ~= nil then
-                        v:SetAttribute("_isOpen", state)
+                        v:SetAttribute("_isOpen", true)
                     end
                 end
             end)
