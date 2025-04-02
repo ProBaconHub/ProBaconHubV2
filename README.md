@@ -15,7 +15,7 @@ Seamless integration is a key focus in enhancing user experience.  Building our
 Developing a custom UI library offers unparalleled flexibility in tailoring user interfaces to specific needs.  A dedicated library ensures consistent design language and a cohesive user experience across the entire platform.  Furthermore, a bespoke UI solution avoids the constraints and dependencies of third-party libraries.  This control translates to a more seamless and integrated service for users.
 
 ### Social media and servers
-Our focus remains on delivering exceptional functionality through existing service channels.  A dedicated server (Discord, Telegram, Twitter) is not currently aligned with our strategic priorities.  This allows us to concentrate resources on enhancing core features and user experience.  We appreciate your understanding in this matter.
+Our focus remains on delivering exceptional functionality through existing service channels.  A dedicated server (Telegram or Twitter) is not currently aligned with our strategic priorities.  This allows us to concentrate resources on enhancing core features and user experience.  We appreciate your understanding in this matter.
 
 ---
 
