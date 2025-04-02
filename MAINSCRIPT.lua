@@ -41,30 +41,12 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-
-local SUPPORTEDGAMES = {
-    "Base Battles!", -- 5326405001 9941625080       v
-    "Blox Hunt", -- 70005410                        v
-    "Break In (Story)", -- 3851622790 4620170611    v
-    "Build a Boat", -- 537413528                    v
-    "Build and Survive! Classic", -- 3056526277     v
-    "Cart Ride Into Rdite", -- 4913581664           v
-    "City Life", -- 5802642341                      v
-    "Destruction Simulator", -- 2248408710          v
-    "Depthless RPG", -- 17488028902                 v
-    "Flag Wars", -- 3214114884                      v
-    "Flee the Facility", -- 893973440               v   DIRECTLY FROM OLD PBH
-    "Forsaken", -- 18687417158
-    "Mad City CH1", -- 91282350711571               v
-    "Notoriety", -- 21532277 (Lobby)                v
-    "Sonic Speed Sim", -- 9049840490                v
-    "TLOTBS RPG", -- 428375933                      v
-    "Wordle", -- 17262338236                        v
-    "Zombie Attack (Beta)" -- 1240123653 1632210982 v
-}
-local PBH_VERSION = "REWRITE: 2.1.8"
-local PBH_LASTUPDATE = "30/3/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.1.9"
+local PBH_LASTUPDATE = "2/4/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.1.9 (2/4/25)]:</b>
+<font color="rgb(0, 162, 255)">Updated</font> to UI 1.7.1
+
 <b>[REWRITE: 2.1.8 (30/3/25)]:</b>
 <font color="rgb(0, 225, 0)">Fixed</font> Auto Interaction in "Mad City: Chater 2"
 <font color="rgb(0, 225, 0)">Added</font> Added door mods in "Mad City: Chater 2"
@@ -181,7 +163,7 @@ New release of the rewritten ProBaconHub.
 local Library, Window, ProBaconFunction, ProBaconUncCheck
 
 local success, output = pcall(function()
-    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.7.0")
+    Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.7.1")
     task.wait(0.1)
     Window = Library.CreateGui("ProBaconHub ["..PBH_VERSION.."]", "ProBaconHub")
     
