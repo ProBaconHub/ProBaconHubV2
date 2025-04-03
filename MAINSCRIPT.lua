@@ -41,9 +41,12 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-local PBH_VERSION = "REWRITE: 2.1.9"
-local PBH_LASTUPDATE = "2/4/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.2.0"
+local PBH_LASTUPDATE = "3/4/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.2.0 (3/4/25)]:</b>
+<font color="rgb(0, 225, 0)">Added</font> new game support: "Age of Heroes".
+
 <b>[REWRITE: 2.1.9 (2/4/25)]:</b>
 <font color="rgb(0, 162, 255)">Updated</font> to UI 1.7.1
 
@@ -1668,7 +1671,45 @@ if success then
     end
     
     local SUPPORTED = true
-    if game.PlaceId == 5326405001 or game.PlaceId == 9941625080 then -- Base Battles
+    if game.PlaceId == 4866692557 then -- Age of heroes
+        local ageofheroesautofarm_Tab = Window:NewTab("Auto Farm")
+        local ageofheroesautofarm_Sec = ageofheroesautofarm_Tab:NewSection("Auto Farm")
+        local AgeOfHeroesFunctionPack = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Age%20of%20Heroes"))()
+        local AUTOFARM = false
+        getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE = getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE or "Heroes"
+        getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH = getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH or 200
+        getgenv().VARIABLEFOLDER.AGEOFHEROESCOOLDOWNPERPUNCH = getgenv().VARIABLEFOLDER.AGEOFHEROESCOOLDOWNPERPUNCH or 200
+        ageofheroesautofarm_Sec:NewDropdown("Farm as", "Which role are you farming towards?", {"Heroes", "Villains", "Both"}, function(opt)
+            getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE = opt
+            if AUTOFARM then
+                AUTOFARM = false
+                AgeOfHeroesFunctionPack.AUTOFARM(false, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH/1000)
+                task.wait(0.1)
+                AUTOFARM = true
+                AgeOfHeroesFunctionPack.AUTOFARM(true, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH/1000)
+            end
+        end)
+        ageofheroesautofarm_Sec:NewSlider("CD per punch (ms)", "The lower the faster.", 0, 1000, function(val)
+            getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH = val
+        end, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH)
+        ageofheroesautofarm_Sec:NewToggle("Auto Farm", "This allows user to farm npcs.", function(state)
+            AUTOFARM = state
+            AgeOfHeroesFunctionPack.AUTOFARM(state, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMTYPE, getgenv().VARIABLEFOLDER.AGEOFHEROESAUTOFARMCOOLDOWNPERPUNCH/1000)
+        end)
+        ageofheroesautofarm_Sec:NewToggle("Auto Collect", "This allows user to collect orbs when they spawns.", function(state)
+            AgeOfHeroesFunctionPack.AUTOCOLLECT(state)
+        end)
+        ageofheroesautofarm_Sec:NewSlider("Punch CD (ms)", "The lower the faster.", 0, 500, function(val)
+            getgenv().VARIABLEFOLDER.AGEOFHEROESCOOLDOWNPERPUNCH = val
+        end, getgenv().VARIABLEFOLDER.AGEOFHEROESCOOLDOWNPERPUNCH)
+        ageofheroesautofarm_Sec:NewToggle("Auto Punch", "This allows user to punch rapidly.", function(state)
+            AgeOfHeroesFunctionPack.AUTOPUNCH(state, getgenv().VARIABLEFOLDER.AGEOFHEROESCOOLDOWNPERPUNCH/1000)
+        end)
+        ageofheroesautofarm_Sec:NewToggle("Auto Punch when players near.", "This allows user to punch rapidly only when another player is near.", function(state)
+            AgeOfHeroesFunctionPack.AUTOPUNCHWHENPLAYERNEAR(state)
+        end)
+
+    elseif game.PlaceId == 5326405001 or game.PlaceId == 9941625080 then -- Base Battles
         local basebattles_Tab = Window:NewTab("Base Battles!")
         local basebattles_Sec = basebattles_Tab:NewSection("Combat")
         basebattles_Sec:NewToggle("Hitbox", "hitbox \nMotified from old ProBaconHub", function(state)
@@ -3672,7 +3713,7 @@ if success then
                             end
                         end
                         while PROTECTED_PLAYERSERVICE.LocalPlayer.Team.Name ~= "Criminals" do
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame*CFrame.new(0,100,0)
+                            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position+Vector3.new(0,50,0))
                             PROTECTED_RUNSERVICE.Heartbeat:Wait()
                         end
                         coroutine.wrap(function()
@@ -3701,6 +3742,7 @@ if success then
                         PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.StatsHUD.CashBagHUD.Cash.Amount.Text = "ProBaconHub"
                         BypassTP(674, 85, 564)
                         task.wait(.5)
+                        ProBaconFunction:VelocityTeleport(681, 84, 585, 50)
                         PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(681, 84, 585)
                         repeat
                             task.wait(0.1)
