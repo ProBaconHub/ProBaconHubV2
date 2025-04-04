@@ -4387,43 +4387,49 @@ if success then
             madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
                 
             madcitych2_Sec:NewErrorLabel("If \"require()\" or \"getgc()\" are not available with current environment. Most features will be disabled.")
-    
+                
+            
+            getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS = getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS or {
+                Licence = "betaVersion_8yb0WCzj3e",
+                MiniHeist = true,
+                -- Only users with a valid licence key will be able to activate the options below.
+                Bank = true,
+                Boat = true,
+                Club = true,
+                Plane = true,
+                Pyramid = true,
+                Resort = true,
+                SpeedMode = true
+            }
+
             madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
-                getgenv().Key = txt
+                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Licence = txt
             end)
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SERVERHOP or true
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_MINIHEIST or true
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_BANK or false
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_CLUB or false
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_RESORT or false
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_PYRAMID or false
-            getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE = getgenv().VARIABLEFOLDER.MADCITYCHAPTER2_SPEEDMODE or false
-            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Server Hop", getgenv().ServerHop}, {"Mini Heist", getgenv().MiniHeist}, {"Bank", getgenv().Bank}, {"Club", getgenv().Club}, {"Resort", getgenv().Resort}, {"Pyramid", getgenv().Pyramid}, {"Speed Mode", getgenv().SpeedMode}}, function(opt)
+            
+            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Mini Heist", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist}, {"Bank", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank}, {"Club", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club}, {"Resort", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort}, {"Pyramid", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid}, {"Speed Mode", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode}}, function(opt)
                 for _,v in pairs(opt) do
-                    if v[1] == "Server Hop" then
-                        getgenv().ServerHop = v[2]
-                    end
                     if v[1] == "Mini Heist" then
-                        getgenv().MiniHeist = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist = v[2]
                     end
                     if v[1] == "Bank" then
-                        getgenv().Bank = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank = v[2]
                     end
                     if v[1] == "Club" then
-                        getgenv().Club = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club = v[2]
                     end
                     if v[1] == "Resort" then
-                        getgenv().Resort = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort = v[2]
                     end
                     if v[1] == "Pyramid" then
-                        getgenv().Pyramid = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid = v[2]
                     end
                     if v[1] == "Speed Mode" then
-                        getgenv().SpeedMode = v[2]
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode = v[2]
                     end
                 end
             end)
             madcitych2farm_Sec:NewButton("Auto Rob V3", "This button allows user to rob heist base on the settings above.", function()
+                getgenv().ProBaconHubMadCityChapter2AutoRobV3Settings = getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoRobV3"))()
             end)
             madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
