@@ -1,7 +1,4 @@
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-    task.wait(1)
-end
+if not game:IsLoaded() then game.Loaded:Wait() end
 local cloneref = cloneref or function(service) return service end
 local PROTECTED_PLAYERSERVICE = cloneref(game:GetService("Players"))
 local PROTECTED_REPLICATEDSTORAGE = cloneref(game:GetService("ReplicatedStorage"))
@@ -28,7 +25,7 @@ if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     game.Players.LocalPlayer.OnTeleport:Connect(function(State)
     	if (not TeleportCheck) and queueteleport then
     		TeleportCheck = true
-    		queueteleport("getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
+    		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() end; getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
     	end
     end)
 else
