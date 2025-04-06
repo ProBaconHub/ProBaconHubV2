@@ -25,7 +25,7 @@ if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     game.Players.LocalPlayer.OnTeleport:Connect(function(State)
     	if (not TeleportCheck) and queueteleport then
     		TeleportCheck = true
-    		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() end; getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
+    		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() task.wait(1) end getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
     	end
     end)
 else
@@ -4348,7 +4348,7 @@ if success then
     elseif game.PlaceId == 1224212277 then -- Mad City Chapter: 2
         task.wait(2)
         local function LOAD_MADCITY_CH2()
-            local MADCITYCHAPTER2FUNCTIONPACK = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
+            getgenv().MADCITYCHAPTER2FUNCTIONPACK = getgenv().MADCITYCHAPTER2FUNCTIONPACK or loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
             local madcitych2_Tab = Window:NewTab("Mad City CH2")
             local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
             local madcitych2farm_Tab = Window:NewTab("Auto Farm")
@@ -4359,11 +4359,11 @@ if success then
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
             end)
             madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
-                MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
-            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
+            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
             madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
-                MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
-            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
+            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
             madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
                 getgenv().ProBaconHubMadCitySilentAimEnabled = state
             end)
@@ -4371,10 +4371,10 @@ if success then
                 getgenv().ProBaconHubMadCitySilentAimTargetPart = opt
             end)
             madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
-                MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
-            end, {MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
+            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
             madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
-                MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
             end)
             madcitych2_Sec:NewButton("Open Doors", "This allows user to open all doors at once", function()
                 for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
