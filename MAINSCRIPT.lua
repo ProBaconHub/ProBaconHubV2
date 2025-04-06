@@ -1,5 +1,6 @@
 if not game:IsLoaded() then
     game.Loaded:Wait()
+    task.wait(1)
 end
 local cloneref = cloneref or function(service) return service end
 local PROTECTED_PLAYERSERVICE = cloneref(game:GetService("Players"))
@@ -22,6 +23,14 @@ getgenv().LINKTOUNPACKKEY = nil
 
 if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     getgenv().PROBACONHUBLOADID = 0
+    local queueteleport = queue_on_teleport or function(arg1) return nil end
+    local TeleportCheck = false
+    game.Players.LocalPlayer.OnTeleport:Connect(function(State)
+    	if (not TeleportCheck) and queueteleport then
+    		TeleportCheck = true
+    		queueteleport("getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
+    	end
+    end)
 else
     getgenv().PROBACONHUBLOADID = getgenv().PROBACONHUBLOADID + 1
 end
@@ -163,7 +172,7 @@ Added get loaderscript.
 New release of the rewritten ProBaconHub.
 ]]
 
-local Library, Window, ProBaconFunction, ProBaconUncCheck
+local Library, Window, ProBaconFunction, ProBaconEnvironmentCheck
 
 local success, output = pcall(function()
     Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconUi/refs/heads/main/ProBaconUi"))()()()()()("UI 1.7.1")
@@ -195,7 +204,7 @@ local success, output = pcall(function()
     ProBaconFunction = FunctionPack:UnpackFunctions(FUNCTIONPACK_UNPACKHASH)
     unpack_functionpack:AddProgress(1)
     load_RMD:AddProgress(1)
-    ProBaconUncCheck = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/UNC_CHECK"))()
+    ProBaconEnvironmentCheck = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/ENVIRONMENT_CHECK"))()
     load_RMD:AddProgress(1)
     task.wait(0.5)
     LoadingTab:Destroy()
@@ -1597,7 +1606,7 @@ if success then
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconGUI/refs/heads/main/superringbackup"))()
     end)
     extrascripts_Sec:NewButton("Check most common UNC", "This UNC validation script reliably verifies the authenticity and non-spoofability of specified UNC functions of the user's executor.", function()
-        ProBaconUncCheck.CHECK_UNC()
+        ProBaconEnvironmentCheck()
     end)
     
     local NOTORIETY_HEIST_TABLE = {
