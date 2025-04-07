@@ -23,9 +23,9 @@ if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     local queueteleport = queue_on_teleport or function(arg1) return nil end
     local TeleportCheck = false
     game.Players.LocalPlayer.OnTeleport:Connect(function(State)
-    	if (not TeleportCheck) and queueteleport then
+    	if not TeleportCheck then
     		TeleportCheck = true
-    		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() task.wait(1) end getgenv().LINKTOUNPACKKEY = "..UNPACKKEY..' loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
+    		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() end getgenv().LINKTOUNPACKKEY = \""..UNPACKKEY..'" loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
     	end
     end)
 else
@@ -47,9 +47,12 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-local PBH_VERSION = "REWRITE: 2.2.0"
-local PBH_LASTUPDATE = "3/4/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.2.1"
+local PBH_LASTUPDATE = "7/4/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.2.1 (7/4/25)]:</b>
+Minor update on functions.
+
 <b>[REWRITE: 2.2.0 (3/4/25)]:</b>
 <font color="rgb(0, 225, 0)">Added</font> new game support: "Age of Heroes".
 
