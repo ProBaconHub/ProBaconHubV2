@@ -22,7 +22,7 @@ if type(getgenv().PROBACONHUBLOADID) ~= "number" then
     getgenv().PROBACONHUBLOADID = 0
     local queueteleport = queue_on_teleport or function(arg1) return nil end
     local TeleportCheck = false
-    game.Players.LocalPlayer.OnTeleport:Connect(function(State)
+    PROTECTED_PLAYERSERVICE.LocalPlayer.OnTeleport:Connect(function(State)
     	if not TeleportCheck then
     		TeleportCheck = true
     		queueteleport("if not game:IsLoaded() then game.Loaded:Wait() end getgenv().LINKTOUNPACKKEY = \""..UNPACKKEY..'" loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconHubV2/refs/heads/main/MAINSCRIPT.lua"))()')
