@@ -47,9 +47,13 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-local PBH_VERSION = "REWRITE: 2.2.1"
-local PBH_LASTUPDATE = "7/4/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.2.2"
+local PBH_LASTUPDATE = "11/4/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.2.2 (11/4/25)]:</b>
+<font color="rgb(0, 162, 255)">Updated</font> module for "Mad City: Chapter 2"
+<font color="rgb(0, 162, 255)">Updated</font> features in "Mad City: Chapter 2"
+
 <b>[REWRITE: 2.2.1 (7/4/25)]:</b>
 Minor update on functions.
 
@@ -4356,17 +4360,14 @@ if success then
             local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
             local madcitych2farm_Tab = Window:NewTab("Auto Farm")
             local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
+            local madcitych2mods_Tab = Window:NewTab("Mods")
+            local madcitych2weaponmods_Sec = madcitych2mods_Tab:NewSection("Weapon Mods")
+            local madcitych2vehiclemods_Sec = madcitych2mods_Tab:NewSection("Vehicle Mods")
             getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
             getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
             pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
             end)
-            madcitych2_Sec:NewToggle("Weapon Mod", "This allows user to mod their weapon.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.ModWeapon(state)
-            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["WeaponMod"], false})
-            madcitych2_Sec:NewToggle("Vehicle Mod", "This allows user to mod their vehicle.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.ModVehicle(state)
-            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["VehicleMod"], false})
             madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
                 getgenv().ProBaconHubMadCitySilentAimEnabled = state
             end)
@@ -4402,23 +4403,43 @@ if success then
                 
             
             getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS = getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS or {
-                Licence = "betaVersion_8yb0WCzj3e",
+                Licence = "", -- Put your key here (required)
+                isInAutoExeFolder = false,
                 MiniHeist = true,
                 -- Only users with a valid licence key will be able to activate the options below.
                 Bank = true,
-                Boat = true,
                 Club = true,
+                Jewelry = true,
                 Plane = true,
                 Pyramid = true,
                 Resort = true,
-                SpeedMode = true
+                Ship = true,
+                SpeedMode = true,
+                Webhook = "", -- Your discord webhook (optional)
+                DiscordId = "", -- Your discord userid for ping (optional)
             }
 
             madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
                 getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Licence = txt
             end)
+            madcitych2farm_Sec:NewTextBox("Webhook", "Leave blank if you don't own a webhook.", function(txt)
+                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Webhook = txt
+            end)
+            madcitych2farm_Sec:NewTextBox("Discord Id", "Leave blank if you don't want a ping.", function(txt)
+                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.DiscordId = txt
+            end)
             
-            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {{"Mini Heist", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist}, {"Bank", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank}, {"Club", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club}, {"Resort", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort}, {"Pyramid", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid}, {"Speed Mode", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode}}, function(opt)
+            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {
+                {"Mini Heist", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist},
+                {"Bank", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank},
+                {"Club", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club},
+                {"Jewelry", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Jewelry},
+                {"Plane", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Plane},
+                {"Resort", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort},
+                {"Pyramid", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid},
+                {"Ship", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Ship},
+                {"Speed Mode", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode}
+            }, function(opt)
                 for _,v in pairs(opt) do
                     if v[1] == "Mini Heist" then
                         getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist = v[2]
@@ -4429,11 +4450,20 @@ if success then
                     if v[1] == "Club" then
                         getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club = v[2]
                     end
+                    if v[1] == "Plane" then
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Plane = v[2]
+                    end
+                    if v[1] == "Jewelry" then
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Jewelry = v[2]
+                    end
                     if v[1] == "Resort" then
                         getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort = v[2]
                     end
                     if v[1] == "Pyramid" then
                         getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid = v[2]
+                    end
+                    if v[1] == "Ship" then
+                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Ship = v[2]
                     end
                     if v[1] == "Speed Mode" then
                         getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode = v[2]
@@ -4448,6 +4478,51 @@ if success then
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
             end)
             madcitych2farm_Sec:NewErrorLabel("If UNC function \"require()\" is not available with current environment. Auto Rob V3 will not work.\nIf UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n\nWe disclaim all liability for account suspensions.")
+            
+            madcitych2weaponmods_Sec:NewToggle("Mod Weapons", "This toggle allows user to mod their weapon on equip.", function(state)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.WeaponMod(state)
+            end)
+            madcitych2weaponmods_Sec:NewToggle("Mod Famas", "This toggle allows user to mod their Famas on equip.", function(state)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.FamasMod(state)
+            end)
+            madcitych2weaponmods_Sec:NewSlider("Rate Of Fire", "This slider allows user to customize the rate of fire of their weapon.", 0, 1, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("RateOfFire", val)
+            end)
+            madcitych2weaponmods_Sec:NewSlider("Clips", "This slider allows user to customize the clip of their weapon.", 0, 5000, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("ClipSize", val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Clips", val)
+            end, 100)
+            madcitych2weaponmods_Sec:NewSlider("Burst", "This slider allows user to customize the burst amount of their weapon.", 0, 5, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Burst", val)
+            end)
+            madcitych2weaponmods_Sec:NewSlider("Burst Time", "This slider allows user to customize the burst time of their weapon.", 0, 1, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("BurstTime", val)
+            end)
+
+            madcitych2vehiclemods_Sec:NewToggle("Mod Vehicles", "This toggle allows user to mod their vehicle on driving.", function(state)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.VehicleMod(state)
+            end)
+            madcitych2vehiclemods_Sec:NewSlider("Max Speed", "This slider allows user to set their vehicle's max speed.", 0, 10000, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MaxSpeed", val)
+            end, 1000)
+            madcitych2vehiclemods_Sec:NewSlider("Start Time", "This slider allows user to set their vehicle's required time for starting.", 0, 3, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("StartTime", val)
+            end)
+            madcitych2vehiclemods_Sec:NewSlider("Boost Force", "This slider allows user to set their vehicle's boosting force.", 0, 1000, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("BoostCarAcceleration", val)
+            end)
+            madcitych2vehiclemods_Sec:NewToggle("Hover Mode", "This toggle allows player to be able to turn their vehicle to hover mode.", function(state)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("CanTurnHoverMode", state)
+            end)
+            madcitych2vehiclemods_Sec:NewSlider("Missile Lock", "This slider allows user to set their vehicle's required time for locking onto a player.", 0, 3, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MissileLock", val)
+            end)
+            madcitych2vehiclemods_Sec:NewSlider("Missile Cooldown", "This slider allows user to set their vehicle's cooldown for a missile.", 0, 5, function(val)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MissileLock", val)
+            end)
+            madcitych2vehiclemods_Sec:NewToggle("Bombs Enabled", "This toggle allows player to be able to enable bombs in their vehicle.", function(state)
+                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("Bombs", state)
+            end)
         end
         if game.PlaceVersion == 11553 then
             LOAD_MADCITY_CH2()
