@@ -47,9 +47,12 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-local PBH_VERSION = "REWRITE: 2.2.2"
-local PBH_LASTUPDATE = "11/4/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.2.3"
+local PBH_LASTUPDATE = "12/4/2025 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.2.3 (12/4/25)]:</b>
+<font color="rgb(0, 225, 0)">Improved</font> "Auto Arrest" in "Mad City: Chater 2"
+
 <b>[REWRITE: 2.2.2 (11/4/25)]:</b>
 <font color="rgb(0, 162, 255)">Updated</font> module for "Mad City: Chapter 2"
 <font color="rgb(0, 162, 255)">Updated</font> features in "Mad City: Chapter 2"
@@ -4399,13 +4402,6 @@ if success then
                     end
                 end
             end)
-            madcitych2_Sec:NewButton("Quick Doors", "This force doors to open quickly.", function()
-                for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
-                    if v:GetAttribute("AnimSpeed") ~= nil then
-                        v:SetAttribute("AnimSpeed", 50)
-                    end
-                end
-            end)
             madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
                 
             madcitych2_Sec:NewErrorLabel("If \"require()\" or \"getgc()\" are not available with current environment. Most features will be disabled.")
@@ -4486,7 +4482,7 @@ if success then
             madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
             end)
-            madcitych2farm_Sec:NewErrorLabel("If UNC function \"require()\" is not available with current environment. Auto Rob V3 will not work.\nIf UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n\nWe disclaim all liability for account suspensions.")
+            madcitych2farm_Sec:NewErrorLabel("If function \"require()\" is not available with current environment. Auto Rob V3 will not work.\nIf UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n\nWe disclaim all liability for account suspensions.")
             
             madcitych2weaponmods_Sec:NewToggle("Mod Weapons", "This toggle allows user to mod their weapon on equip.", function(state)
                 getgenv().MADCITYCHAPTER2FUNCTIONPACK.WeaponMod(state)
