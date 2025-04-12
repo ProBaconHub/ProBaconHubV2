@@ -4492,7 +4492,7 @@ if success then
                 getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("ClipSize", val)
                 getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Clips", val)
             end, 100)
-            madcitych2weaponmods_Sec:NewSlider("Burst", "This slider allows user to customize the burst amount of their weapon.", 0, 5, function(val)
+            madcitych2weaponmods_Sec:NewSlider("Burst", "This slider allows user to customize the burst amount of their weapon.", 0, 10, function(val)
                 getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Burst", val)
             end)
             madcitych2weaponmods_Sec:NewSlider("Burst Time", "This slider allows user to customize the burst time of their weapon.", 0, 1, function(val)
