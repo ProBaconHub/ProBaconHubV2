@@ -14,8 +14,8 @@ local PROTECTED_STARTERGUI = cloneref(game:GetService("StarterGui"))
 local PROTECTED_HTTPSERVICE = cloneref(game:GetService("HttpService"))
 local setclipboard = setclipboard or print
 
-local UNPACKKEY = getgenv().LINKTOUNPACKKEY
-getgenv().LINKTOUNPACKKEY = nil
+local UNPACKKEY = "https://raw.githubusercontent.com/ProBaconHub/BackStage/refs/heads/main/FunctionPack/0afIOgw33a" --getgenv().LINKTOUNPACKKEY
+getgenv().LINKTOUNPACKKEY = "nil"
 
 
 if type(getgenv().PROBACONHUBLOADID) ~= "number" then
@@ -47,9 +47,14 @@ PROTECTED_PLAYERSERVICE.PlayerAdded:Connect(function()
 end)
 
 
-local PBH_VERSION = "REWRITE: 2.2.3"
-local PBH_LASTUPDATE = "12/4/2025 (UTC)"
+local PBH_VERSION = "REWRITE: 2.3.0"
+local PBH_LASTUPDATE = "15/1/26 (UTC)"
 local UPDATELOG = [[
+<b>[REWRITE: 2.3.0 (15/1/26)]:</b>
+<font color="rgb(0, 162, 255)">Cleaned up</font> code mess.
+<font color="rgb(175, 0, 0)">Terminated/Removed</font> "Mad City: Chapter 2"
+<font color="rgb(255, 255, 0)">Notice: </font> ProBaconHub REWRITE development has been <font color="rgb(175, 0, 0)">discontinued</font>. Further development packages will be donated to other script hubs.
+
 <b>[REWRITE: 2.2.3 (12/4/25)]:</b>
 <font color="rgb(0, 225, 0)">Improved</font> "Auto Arrest" in "Mad City: Chater 2"
 
@@ -192,7 +197,11 @@ local success, output = pcall(function()
     local load_RMD = loadingSec:NewProgressBar("Loading RMD", "Loading all required minimum distribution", 0, 4, function()
         Window:NotificationBar("ProBaconHub", "Successfully loaded RMD", 1)
         task.wait(0.1)
-        Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 3)
+        Window:NotificationBar("ProBaconHub", " Last update: "..PBH_LASTUPDATE, 1)
+        task.wait(0.1)
+        Window:NotificationBar("ProBaconHub", "ProBaconHub is discontinued.", 10)
+        task.wait(0.1)
+        Window:NotificationBar("ProBaconHub", "Further development packages will be donated to other script hubs.", 10)
     end)
     if getgenv().VARIABLEFOLDER == nil then
         getgenv().VARIABLEFOLDER = {}
@@ -3554,7 +3563,7 @@ if success then
                     return false
                 end
             end
-            getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Tween"
+            getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Instant"
             local function BypassTP(x, y, z, tpmethod)
                 if tpmethod == nil then
                     tpmethod = getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD
@@ -3618,37 +3627,6 @@ if success then
                 end
                 return false
             end
-        
-            local checkbypassmethod_Tab = Window:NewTab("Checking...")
-            local checkbypassmethod_Sec = checkbypassmethod_Tab:NewSection("Check", true)
-            local checkbypassmethodprogressbar = checkbypassmethod_Sec:NewProgressBar("Checking bypass method...", "Bypass method allows user to teleport instantly.", 0, 2)
-            local checkpos = PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.CFrame
-            coroutine.wrap(function()
-                BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Instant")
-                checkbypassmethodprogressbar:AddProgress(1)
-            end)()
-            if PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI:FindFirstChild("TeleportEffect") then
-                repeat
-                    task.wait(.01)
-                until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency ~= 1
-                repeat
-                    task.wait(.01)
-                until PROTECTED_PLAYERSERVICE.LocalPlayer.PlayerGui.MainGUI.TeleportEffect.Transparency == 1
-            else
-                task.wait(0.5)
-            end
-            task.wait(.5)
-            PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = true
-            if (PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1048, 18, -492)).Magnitude > 5 then
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
-                getgenv().VARIABLEFOLDER.MADCITYBYPASSMETHOD = "Instant"
-                PROTECTED_STARTERGUI:SetCore("SendNotification", {Title="Pro Bacon"; Text="Teleportation bypass available!"; Duration=5;})
-            else
-                PROTECTED_PLAYERSERVICE.LocalPlayer.Character.HumanoidRootPart.Anchored = false
-                BypassTP(checkpos.X, checkpos.Y, checkpos.Z, "Tween")
-            end
-            checkbypassmethodprogressbar:AddProgress(1)
-            checkbypassmethod_Tab:Destroy()
         
             local madcitych1autofarm_Tab = Window:NewTab("Auto Farm")
             local madcitych1items_Tab = Window:NewTab("Items")
@@ -4355,191 +4333,7 @@ if success then
                 Callback2 = LOAD_MADCITY_CH1
             })
         end
-    elseif game.PlaceId == 1224212277 then -- Mad City Chapter: 2
-        task.wait(2)
-        local function LOAD_MADCITY_CH2()
-            getgenv().MADCITYCHAPTER2FUNCTIONPACK = getgenv().MADCITYCHAPTER2FUNCTIONPACK or loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Game%20Functions/Mad%20City%3A%20Chapter%202"))()(Library, Window)
-            local madcitych2_Tab = Window:NewTab("Mad City CH2")
-            local madcitych2_Sec = madcitych2_Tab:NewSection("Mad City: Chapter 2 [PRIVATE SCRIPT RELEASE]")
-            local madcitych2farm_Tab = Window:NewTab("Auto Farm")
-            local madcitych2farm_Sec = madcitych2farm_Tab:NewSection("Farms")
-            local madcitych2mods_Tab = Window:NewTab("Mods")
-            local madcitych2weaponmods_Sec = madcitych2mods_Tab:NewSection("Weapon Mods")
-            local madcitych2vehiclemods_Sec = madcitych2mods_Tab:NewSection("Vehicle Mods")
-            getgenv().ProBaconHubMadCitySilentAimTargetPart = getgenv().ProBaconHubMadCitySilentAimTargetPart or "Head"
-            getgenv().ProBaconHubMadCitySilentAimEnabled = getgenv().ProBaconHubMadCitySilentAimEnabled or false
-            pcall(function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/SilentAimV2"))()
-            end)
-            madcitych2_Sec:NewToggle("Silent Aim", "Silent aim assist users with better aim.", function(state)
-                getgenv().ProBaconHubMadCitySilentAimEnabled = state
-            end)
-            madcitych2_Sec:NewDropdown("Aim Parts", "Choose a body part to aim at.", {"Head", "HumanoidRootPart", "UpperTorso"}, function(opt)
-                getgenv().ProBaconHubMadCitySilentAimTargetPart = opt
-            end)
-            madcitych2_Sec:NewToggle("Hitbox", "This allows user to expand enemy's hitbox.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.HitboxExpand(state)
-            end, {getgenv().MADCITYCHAPTER2FUNCTIONPACK.GetSettings()["Hitbox"], false})
-            madcitych2_Sec:NewToggle("Infinite Stamina", "This allows user to set their stamina to maxmium.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.InfiniteStamina(state)
-            end)
-            madcitych2_Sec:NewToggle("Auto Hack Door", "This allows user to skip the process of hacking door.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.AUTODOORHACK(state)
-            end)
-            madcitych2_Sec:NewToggle("Auto Connect Wire", "This allows user to skip the process of connecting wires.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.AUTOWIREHACK(state)
-            end)
-            madcitych2_Sec:NewToggle("Auto Drill Vualt", "This allows user to skip the process of drilling the vault.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.AUTORESORTDRILL(state)
-            end)
-            madcitych2_Sec:NewButton("Unlock all emote", "This allows user to unlock all emote including game pass based emotes.", function()
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.UnlockEmotes()
-            end)
-            madcitych2_Sec:NewButton("Open Doors", "This allows user to open all doors at once", function()
-                for _,v in pairs(PROTECTED_WORKSPACE:GetDescendants()) do
-                    if v:GetAttribute("_isOpen") ~= nil then
-                        v:SetAttribute("_isOpen", true)
-                    end
-                end
-            end)
-            madcitych2_Sec:NewWarningLabel("Performance degradation is expected with obfuscated function packs. We have already minimized the lag due to the obfuscation. We are working on further patch!\n\nMost features does not work with Xeno.")
-                
-            madcitych2_Sec:NewErrorLabel("If \"require()\" or \"getgc()\" are not available with current environment. Most features will be disabled.")
-                
-            
-            getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS = getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS or {
-                Licence = "", -- Put your key here (required)
-                isInAutoExeFolder = false,
-                MiniHeist = true,
-                -- Only users with a valid licence key will be able to activate the options below.
-                Bank = true,
-                Club = true,
-                Jewelry = true,
-                Plane = true,
-                Pyramid = true,
-                Resort = true,
-                Ship = true,
-                SpeedMode = true,
-                Webhook = "", -- Your discord webhook (optional)
-                DiscordId = "", -- Your discord userid for ping (optional)
-            }
-
-            madcitych2farm_Sec:NewTextBox("Key", "Leave blank if you don't own a licence key.", function(txt)
-                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Licence = txt
-            end)
-            madcitych2farm_Sec:NewTextBox("Webhook", "Leave blank if you don't own a webhook.", function(txt)
-                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Webhook = txt
-            end)
-            madcitych2farm_Sec:NewTextBox("Discord Id", "Leave blank if you don't want a ping.", function(txt)
-                getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.DiscordId = txt
-            end)
-            
-            madcitych2farm_Sec:NewCheckbox("Settings", "Toggle settings you would like to includ in the auto rob. \nThe following features are only available for users who own a licence key: \nBank\nClub\nResort\nPyramid\nSpeedMode", {
-                {"Mini Heist", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist},
-                {"Bank", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank},
-                {"Club", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club},
-                {"Jewelry", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Jewelry},
-                {"Plane", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Plane},
-                {"Resort", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort},
-                {"Pyramid", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid},
-                {"Ship", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Ship},
-                {"Speed Mode", getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode}
-            }, function(opt)
-                for _,v in pairs(opt) do
-                    if v[1] == "Mini Heist" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.MiniHeist = v[2]
-                    end
-                    if v[1] == "Bank" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Bank = v[2]
-                    end
-                    if v[1] == "Club" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Club = v[2]
-                    end
-                    if v[1] == "Plane" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Plane = v[2]
-                    end
-                    if v[1] == "Jewelry" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Jewelry = v[2]
-                    end
-                    if v[1] == "Resort" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Resort = v[2]
-                    end
-                    if v[1] == "Pyramid" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Pyramid = v[2]
-                    end
-                    if v[1] == "Ship" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.Ship = v[2]
-                    end
-                    if v[1] == "Speed Mode" then
-                        getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS.SpeedMode = v[2]
-                    end
-                end
-            end)
-            madcitych2farm_Sec:NewButton("Auto Rob V3", "This button allows user to rob heist base on the settings above.", function()
-                getgenv().ProBaconHubMadCityChapter2AutoRobV3Settings = getgenv().VARIABLEFOLDER.MADCITYCH2AUTOROBSETTINGS
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoRobV3"))()
-            end)
-            madcitych2farm_Sec:NewButton("Auto Arrest V2", "This button allows user to arrest criminals with just one click of a button.", function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/Mad-City-Script/refs/heads/main/MadCityAutoArrestV2"))()
-            end)
-            madcitych2farm_Sec:NewErrorLabel("If function \"require()\" is not available with current environment. Auto Rob V3 will not work.\nIf UNC function \"getgc()\" is not available with current environment. Auto Arrest V2 will not work.\n\nWe disclaim all liability for account suspensions.")
-            
-            madcitych2weaponmods_Sec:NewToggle("Mod Weapons", "This toggle allows user to mod their weapon on equip.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.WeaponMod(state)
-            end)
-            madcitych2weaponmods_Sec:NewToggle("Mod Famas", "This toggle allows user to mod their Famas on equip.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.FamasMod(state)
-            end)
-            madcitych2weaponmods_Sec:NewSlider("Rate Of Fire", "This slider allows user to customize the rate of fire of their weapon.", 0, 1, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("RateOfFire", val)
-            end)
-            madcitych2weaponmods_Sec:NewSlider("Clips", "This slider allows user to customize the clip of their weapon.", 0, 5000, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("ClipSize", val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Clips", val)
-            end, 100)
-            madcitych2weaponmods_Sec:NewSlider("Burst", "This slider allows user to customize the burst amount of their weapon.", 0, 15, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("Burst", val)
-            end)
-            madcitych2weaponmods_Sec:NewSlider("Burst Time", "This slider allows user to customize the burst time of their weapon.", 0, 1, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetWeaponState("BurstTime", val)
-            end)
-
-            madcitych2vehiclemods_Sec:NewToggle("Mod Vehicles", "This toggle allows user to mod their vehicle on driving.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.VehicleMod(state)
-            end)
-            madcitych2vehiclemods_Sec:NewSlider("Max Speed", "This slider allows user to set their vehicle's max speed.", 0, 10000, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MaxSpeed", val)
-            end, 1000)
-            madcitych2vehiclemods_Sec:NewSlider("Start Time", "This slider allows user to set their vehicle's required time for starting.", 0, 3, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("StartTime", val)
-            end)
-            madcitych2vehiclemods_Sec:NewSlider("Boost Force", "This slider allows user to set their vehicle's boosting force.", 0, 1000, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("BoostCarAcceleration", val)
-            end)
-            madcitych2vehiclemods_Sec:NewToggle("Hover Mode", "This toggle allows player to be able to turn their vehicle to hover mode.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("CanTurnHoverMode", state)
-            end)
-            madcitych2vehiclemods_Sec:NewSlider("Missile Lock", "This slider allows user to set their vehicle's required time for locking onto a player.", 0, 3, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MissileLock", val)
-            end)
-            madcitych2vehiclemods_Sec:NewSlider("Missile Cooldown", "This slider allows user to set their vehicle's cooldown for a missile.", 0, 5, function(val)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("MissileLock", val)
-            end)
-            madcitych2vehiclemods_Sec:NewToggle("Bombs Enabled", "This toggle allows player to be able to enable bombs in their vehicle.", function(state)
-                getgenv().MADCITYCHAPTER2FUNCTIONPACK.SetVehicleState("Bombs", state)
-            end)
-        end
-        if game.PlaceVersion == 11553 then
-            LOAD_MADCITY_CH2()
-        else
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/ProBaconFunctions/refs/heads/main/Universal%20Functions/OptionChooser"))().OptionChooser({
-                Title = "Game Update Detection",
-                Content = "A game update has been detected, potentially resulting in script patching or detection.  Do you wish to proceed with loading the Mad City: Chapter 2 tabs?",
-                Button1 = "No.",
-                Button2 = "Proceed.",
-                Callback2 = LOAD_MADCITY_CH2
-            })
-        end
+    
     elseif game.PlaceId == 21532277 then -- Notoriety Lobby
         local notorietylobby_Tab = Window:NewTab("Notoriety")
         local notorietylobby_Sec = notorietylobby_Tab:NewSection("Lobby")
